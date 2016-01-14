@@ -233,12 +233,13 @@ BEGIN
           END IF;
         END IF;
         update_rgb     <= '1';              -- clock out these new RGB values
-        IF(col_count < PANEL_WIDTH) THEN      -- check if at the rightmost side of the image
-          s_oe_n     <= '0';                -- enable display while simply updating the shift register
-          next_state <= INCR_COL_ADDR;
-        ELSE
+
+        IF(col_count = PANEL_WIDTH-1) THEN      -- check if at the rightmost side of the image
           s_oe_n     <= '1';                -- disable display before latch in new LED anodes
           next_state <= LATCH;
+        ELSE
+          s_oe_n     <= '0';                -- enable display while simply updating the shift register
+          next_state <= INCR_COL_ADDR;
         END IF;
         
       WHEN INCR_COL_ADDR =>
