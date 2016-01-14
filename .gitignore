@@ -49,3 +49,8 @@ bitgen.xmsgs
 ise_files/top_level_bitgen.xwbt
 ise_files/par_usage_statistics.html
 ise_files/top_level_guide.ncd
+ise_files/_xmsgs
+ise_files/iseconfig/top_level.xreport
+ise_files/top_level_envsettings.html
+ise_files/top_level_summary.htm
+ise_files/top_level_summary.html

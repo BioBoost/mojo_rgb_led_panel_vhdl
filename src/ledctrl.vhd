@@ -56,32 +56,28 @@ ENTITY ledctrl IS
   PORT (
     rst      : IN  STD_LOGIC;
     clk_in   : IN  STD_LOGIC;
-    div      : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
     -- LED Debug IO
     frame    : OUT STD_LOGIC;           -- if '1', then at the start of a frame (ie. bpp_count = 0)
     -- LED Panel IO
     clk_out  : OUT STD_LOGIC;
     rgb1     : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     rgb2     : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    row_addr : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    row_addr : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     lat      : OUT STD_LOGIC;
-    oe_n     : OUT STD_LOGIC;
-    -- Memory IO
-    addr     : OUT STD_LOGIC_VECTOR(ADDR_WIDTH-1 DOWNTO 0);
-    data     : IN  STD_LOGIC_VECTOR(DATA_WIDTH-1 DOWNTO 0)
+    oe_n     : OUT STD_LOGIC
     );
 END ledctrl;
 
 ARCHITECTURE bhv OF ledctrl IS
   -- Internal signals
-  SIGNAL clk_en, clk30_en, clk20_en, clk10_en, clk05_en : STD_LOGIC;
+  SIGNAL clk_en : STD_LOGIC;
 
   -- Essential state machine signals
   TYPE STATE_TYPE IS (INIT, READ_PIXEL_DATA, INCR_COL_ADDR, LATCH, INCR_ROW_ADDR);
   SIGNAL state, next_state : STATE_TYPE;
 
   -- State machine signals
-  SIGNAL col_count, next_col_count : UNSIGNED(IMG_WIDTH_LOG2 DOWNTO 0);
+  SIGNAL col_count, next_col_count : UNSIGNED(PANEL_WIDTH_VECTOR_SIZE-1 DOWNTO 0);
   SIGNAL bpp_count, next_bpp_count : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
   SIGNAL s_row_addr, next_row_addr : STD_LOGIC_VECTOR(row_addr'range);
   SIGNAL next_rgb1, next_rgb2      : STD_LOGIC_VECTOR(rgb1'range);
@@ -92,70 +88,6 @@ ARCHITECTURE bhv OF ledctrl IS
 
 BEGIN
 
-  ------------------------------------------------------------------------------------------------------------------------
-  ---- Allow one of 4 clock speeds.
-  ----
-  ---- For a 16 x 32 RGB matrix with 8 bit pixel depth, 5 MHz clock =~ 30 frames per second
-  ------------------------------------------------------------------------------------------------------------------------
-
-  ---- A simple clock divider is used here to slow down this part of the circuit
-  --U_CLKDIV30 : ENTITY work.clk_div
-  --  GENERIC MAP (
-  --    clk_in_freq  => 40000000,         -- 40MHz input clock
-  --    clk_out_freq => 30000000          -- 30MHz output clock
-  --    )
-  --  PORT MAP (
-  --    rst    => rst,
-  --    clk_in => clk_in,
-  --    clk_en => clk30_en
-  --    );
-
-
-  ---- A simple clock divider is used here to slow down this part of the circuit
-  --U_CLKDIV20 : ENTITY work.clk_div
-  --  GENERIC MAP (
-  --    clk_in_freq  => 40000000,         -- 40MHz input clock
-  --    clk_out_freq => 20000000          -- 20MHz output clock
-  --    )
-  --  PORT MAP (
-  --    rst    => rst,
-  --    clk_in => clk_in,
-  --    clk_en => clk20_en
-  --    );
-
-  ---- A simple clock divider is used here to slow down this part of the circuit
-  --U_CLKDIV10 : ENTITY work.clk_div
-  --  GENERIC MAP (
-  --    clk_in_freq  => 40000000,         -- 40MHz input clock
-  --    clk_out_freq => 10000000          -- 10MHz output clock
-  --    )
-  --  PORT MAP (
-  --    rst    => rst,
-  --    clk_in => clk_in,
-  --    clk_en => clk10_en
-  --    );
-
-  ---- A simple clock divider is used here to slow down this part of the circuit
-  --U_CLKDIV05 : ENTITY work.clk_div
-  --  GENERIC MAP (
-  --    clk_in_freq  => 40000000,         -- 40MHz input clock
-  --    clk_out_freq => 05000000          --  5MHz output clock
-  --    )
-  --  PORT MAP (
-  --    rst    => rst,
-  --    clk_in => clk_in,
-  --    clk_en => clk05_en
-  --    );
-
-  ---- Select when speed to run the clock enable which ultimately
-  ---- effects the frame rate. Note that there are 2 states per clk_out
-  ---- period so a 5 MHz clk_en means that clk_out essentially runs a
-  ---- 5 MHz / 2 = 2.5 MHz.
-  --clk_en <= clk30_en WHEN rate = "11" ELSE
-  --          clk20_en WHEN rate = "10" ELSE
-  --          clk10_en WHEN rate = "01" ELSE
-  --          clk05_en;
-
   ----------------------------------------------------------------------------------------------------------------------
   -- For a 16 x 32 RGB matrix with 24-bit pixel depth (8-bit per R,G & B), 5 MHz clock =~ 30 frames per second
   -- but this rate has a noticable flicker.  So 10 MHz clock =~ 76 fps is better.  div = 3 for 10 MHz
@@ -165,16 +97,12 @@ BEGIN
     PORT MAP (
       rst    => rst,
       clk_in => clk_in,
-      div    => UNSIGNED(div),
+      div    => to_unsigned(CLOCK_DIVIDER, 8),
       clk_en => clk_en);
 
   ----------------------------------------------------------------------------------------------------------------------
   -- Breakout internal signals to the output port
   row_addr <= s_row_addr;
-
-  -- col_count is one extra bit long in order to compare against the expected
-  -- width.  So discard that upper bit for ram addr
-  addr <= s_row_addr & STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0));
 
   ----------------------------------------------------------------------------------------------------------------------
   -- State register
@@ -184,7 +112,7 @@ BEGIN
       state      <= INIT;
       col_count  <= (OTHERS => '0');
       bpp_count  <= (OTHERS => '1');    -- first state transition incrs bpp_count so start at -1 so first bpp_count = 0
-      s_row_addr <= (OTHERS => '1');    -- this inits to 111 because the row_addr is incr when bpp_count = 255
+      s_row_addr <= (OTHERS => '1');    -- this inits to 1111 because the row_addr is incr when bpp_count = 255
       frame      <= '0';
       rgb1       <= (OTHERS => '0');
       rgb2       <= (OTHERS => '0');
@@ -217,9 +145,8 @@ BEGIN
   END PROCESS;
 
   -- Next-state logic
-  PROCESS(state, col_count, bpp_count, s_row_addr, data) IS
+  PROCESS(state, col_count, bpp_count, s_row_addr) IS
     -- Internal breakouts
-    VARIABLE upper, lower              : UNSIGNED(DATA_WIDTH/2-1 DOWNTO 0);
     VARIABLE upper_r, upper_g, upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE lower_r, lower_g, lower_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE r1, g1, b1, r2, g2, b2    : STD_LOGIC;
@@ -232,14 +159,12 @@ BEGIN
     -- a PIXEL_DEPTH of 3 results in a 18-bit word arranged RRRGGGBBBrrrgggbbb.
     -- The following assignments break up this encoding into the human-readable
     -- signals used above, or reconstruct it into LED data signals.
-    upper   := UNSIGNED(data(DATA_WIDTH-1 DOWNTO DATA_WIDTH/2));
-    lower   := UNSIGNED(data(DATA_WIDTH/2-1 DOWNTO 0));
-    upper_r := upper(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
-    upper_g := upper(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
-    upper_b := upper(PIXEL_DEPTH-1 DOWNTO 0);
-    lower_r := lower(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
-    lower_g := lower(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
-    lower_b := lower(PIXEL_DEPTH-1 DOWNTO 0);
+    upper_r := to_unsigned(0, PIXEL_DEPTH);
+    upper_g := to_unsigned(128, PIXEL_DEPTH);
+    upper_b := to_unsigned(0, PIXEL_DEPTH);
+    lower_r := to_unsigned(0, PIXEL_DEPTH);
+    lower_g := to_unsigned(0, PIXEL_DEPTH);
+    lower_b := to_unsigned(25, PIXEL_DEPTH);
 
     r1 := '0'; g1 := '0'; b1 := '0';    -- Defaults
     r2 := '0'; g2 := '0'; b2 := '0';    -- Defaults
@@ -278,7 +203,7 @@ BEGIN
 
       WHEN INCR_ROW_ADDR =>
         -- display is disabled during row_addr (select lines) update
-        IF (s_row_addr = "111") THEN
+        IF (s_row_addr = "1111") THEN
           next_frame <= '1';                -- indicate at start of a frame (incrementing row to 0)
         END IF;
         next_row_addr  <= STD_LOGIC_VECTOR(UNSIGNED(s_row_addr) + 1);
@@ -308,7 +233,7 @@ BEGIN
           END IF;
         END IF;
         update_rgb     <= '1';              -- clock out these new RGB values
-        IF(col_count < IMG_WIDTH) THEN      -- check if at the rightmost side of the image
+        IF(col_count < PANEL_WIDTH) THEN      -- check if at the rightmost side of the image
           s_oe_n     <= '0';                -- enable display while simply updating the shift register
           next_state <= INCR_COL_ADDR;
         ELSE

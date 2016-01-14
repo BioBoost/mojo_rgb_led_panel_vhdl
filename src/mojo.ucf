@@ -6,27 +6,46 @@ TIMESPEC TS_clk = PERIOD "clk" 50 MHz HIGH 50%;
 NET "clk" LOC = P56;
 NET "rst_n" LOC = P38;
 
-NET "cclk" LOC = P70;
+# RGB LED Panel
+NET "board_clock" LOC = P81 | IOSTANDARD = LVTTL;
+NET "latch" LOC = P83 | IOSTANDARD = LVTTL;
+NET "output_enable_n" LOC = P82 | IOSTANDARD = LVTTL;
 
-NET "led<0>" LOC = P134;
-NET "led<1>" LOC = P133;
-NET "led<2>" LOC = P132;
-NET "led<3>" LOC = P131;
-NET "led<4>" LOC = P127;
-NET "led<5>" LOC = P126;
-NET "led<6>" LOC = P124;
-NET "led<7>" LOC = P123;
+NET "line_select<0>" LOC = P142 | IOSTANDARD = LVTTL;
+NET "line_select<1>" LOC = P141 | IOSTANDARD = LVTTL;
+NET "line_select<2>" LOC = P140 | IOSTANDARD = LVTTL;
+NET "line_select<3>" LOC = P139 | IOSTANDARD = LVTTL;
 
-NET "spi_mosi" LOC = P44;
-NET "spi_miso" LOC = P45;
-NET "spi_ss" LOC = P48;
-NET "spi_sck" LOC = P43;
-NET "spi_channel<0>" LOC = P46;
-NET "spi_channel<1>" LOC = P61;
-NET "spi_channel<2>" LOC = P62;
-NET "spi_channel<3>" LOC = P65;
+NET "top_rgb<0>" LOC = P102 | IOSTANDARD = LVTTL;
+NET "top_rgb<1>" LOC = P101 | IOSTANDARD = LVTTL;
+NET "top_rgb<2>" LOC = P100 | IOSTANDARD = LVTTL;
 
-NET "avr_tx" LOC = P55;
-NET "avr_rx" LOC = P59;
-NET "avr_rx_busy" LOC = P39;
+NET "bottom_rgb<0>" LOC = P99 | IOSTANDARD = LVTTL;
+NET "bottom_rgb<1>" LOC = P98 | IOSTANDARD = LVTTL;
+NET "bottom_rgb<2>" LOC = P97 | IOSTANDARD = LVTTL;
+
+
+# NET "cclk" LOC = P70;
+
+NET "leds<0>" LOC = P134;
+NET "leds<1>" LOC = P133;
+NET "leds<2>" LOC = P132;
+NET "leds<3>" LOC = P131;
+NET "leds<4>" LOC = P127;
+NET "leds<5>" LOC = P126;
+NET "leds<6>" LOC = P124;
+NET "leds<7>" LOC = P123;
+
+# NET "spi_mosi" LOC = P44;
+# NET "spi_miso" LOC = P45;
+# NET "spi_ss" LOC = P48;
+# NET "spi_sck" LOC = P43;
+# NET "spi_channel<0>" LOC = P46;
+# NET "spi_channel<1>" LOC = P61;
+# NET "spi_channel<2>" LOC = P62;
+# NET "spi_channel<3>" LOC = P65;
+
+# NET "avr_tx" LOC = P55;
+# NET "avr_rx" LOC = P59;
+# NET "avr_rx_busy" LOC = P39;
 
