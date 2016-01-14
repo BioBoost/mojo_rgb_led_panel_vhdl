@@ -32,6 +32,7 @@ ENTITY top_level IS
   PORT (
     rst_n             : IN STD_LOGIC;
     clk               : IN STD_LOGIC;
+    cclk              : IN STD_LOGIC;    -- configuration clock (?) from AVR (to detect when AVR ready)
 
     -- Outputs to the 8 onboard LEDs
     leds              : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -41,17 +42,35 @@ ENTITY top_level IS
 
 	 -- RGB LED Panel Connections
     board_clock       : OUT STD_LOGIC;
-    top_color         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    bottom_color      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    top_rgb           : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     line_select       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     latch             : OUT STD_LOGIC;
-    output_enable_n   : OUT STD_LOGIC
+    output_enable_n   : OUT STD_LOGIC;
+
+
+    spi_sck   : in  std_logic;    -- SPI clock to from AVR
+    spi_ss    : in  std_logic;    -- SPI slave select from AVR
+    spi_mosi  : in  std_logic;    -- SPI serial data master out, slave in (AVR -> FPGA)
+    spi_miso  : out std_logic;    -- SPI serial data master in, slave out (AVR <- FPGA)
+    spi_channel : out std_logic_vector(3 downto 0);  -- analog read channel (input to AVR service task)
+    avr_tx    : in  std_logic;    -- serial data transmited from AVR/USB (FPGA recieve)
+    avr_rx    : out std_logic;    -- serial data for AVR/USB to receive (FPGA transmit)
+    avr_rx_busy : in  std_logic     -- AVR/USB buffer full (don't send data when true)
     );
 END top_level;
 
 ARCHITECTURE str OF top_level IS
   SIGNAL rst_p : STD_LOGIC;
 BEGIN
+
+-- NOTE: If you are not using the avr_interface component, then you should uncomment the
+--       following lines to keep the AVR output lines in a high-impeadence state.  When
+--       using the avr_interface, this will be done automatically and these lines should
+--       be commented out (or else "multiple signals connected to output" errors).
+  spi_miso <= 'Z';            -- keep AVR output lines high-Z
+  avr_rx <= 'Z';            -- keep AVR output lines high-Z
+  spi_channel <= "ZZZZ";        -- keep AVR output lines high-Z
 
   leds(7 DOWNTO 4) <= (OTHERS => '1');
   leds(3 DOWNTO 1) <= (OTHERS => '0');
@@ -66,8 +85,8 @@ BEGIN
 
       -- Connection to LED panel
       clk_out     => board_clock,
-      rgb1        => top_color,
-      rgb2        => bottom_color,
+      rgb1        => top_rgb,
+      rgb2        => bottom_rgb,
       row_addr    => line_select,
       lat         => latch,
       oe_n        => output_enable_n
