@@ -64,7 +64,10 @@ ENTITY ledctrl IS
     rgb2     : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     row_addr : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     lat      : OUT STD_LOGIC;
-    oe_n     : OUT STD_LOGIC
+    oe_n     : OUT STD_LOGIC;
+    -- Connection with frame buffer
+    buffer_address  : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+    buffer_data     : IN  STD_LOGIC_VECTOR(23 DOWNTO 0)
     );
 END ledctrl;
 
@@ -115,6 +118,10 @@ BEGIN
   ----------------------------------------------------------------------------------------------------------------------
   -- Breakout internal signals to the output port
   row_addr <= s_row_addr;
+
+  -- col_count is one extra bit long in order to compare against the expected
+  -- width.  So discard that upper bit for ram addr
+  --addr <= s_row_addr & STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0));
 
   ----------------------------------------------------------------------------------------------------------------------
   -- State register
@@ -178,6 +185,27 @@ BEGIN
     VARIABLE lower_r, lower_g, lower_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE r1, g1, b1, r2, g2, b2    : STD_LOGIC;
   BEGIN
+
+    -- Pixel data is given as 2 combined words, with the upper half containing
+    -- the upper pixel and the lower half containing the lower pixel. Inside
+    -- each half the pixel data is encoded in RGB order with multiple repeated
+    -- bits for each subpixel depending on the chosen color depth. For example,
+    -- a PIXEL_DEPTH of 3 results in a 18-bit word arranged RRRGGGBBBrrrgggbbb.
+    -- The following assignments break up this encoding into the human-readable
+    -- signals used above, or reconstruct it into LED data signals.
+    upper   := UNSIGNED(data(DATA_WIDTH-1 DOWNTO DATA_WIDTH/2));
+    lower   := UNSIGNED(data(DATA_WIDTH/2-1 DOWNTO 0));
+    upper_r := upper(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
+    upper_g := upper(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
+    upper_b := upper(PIXEL_DEPTH-1 DOWNTO 0);
+    lower_r := lower(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
+    lower_g := lower(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
+    lower_b := lower(PIXEL_DEPTH-1 DOWNTO 0);
+
+
+
+
+  
 
     extended_upper_row := to_integer(unsigned(s_row_addr));
     extended_lower_row := to_integer(unsigned('1' & s_row_addr));
