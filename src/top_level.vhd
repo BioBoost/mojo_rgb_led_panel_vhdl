@@ -56,7 +56,7 @@ ENTITY top_level IS
     spi_channel : out std_logic_vector(3 downto 0);  -- analog read channel (input to AVR service task)
     avr_tx    : in  std_logic;    -- serial data transmited from AVR/USB (FPGA recieve)
     avr_rx    : out std_logic;    -- serial data for AVR/USB to receive (FPGA transmit)
-    avr_rx_busy : in  std_logic     -- AVR/USB buffer full (don't send data when true)
+    avr_rx_busy : in  std_logic   -- AVR/USB buffer full (don't send data when true)
     );
 END top_level;
 
@@ -80,6 +80,27 @@ ARCHITECTURE str OF top_level IS
       addrb : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
       doutb : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
     );
+  END COMPONENT;
+
+  COMPONENT spi_slave
+    PORT(
+      sclk         : IN     STD_LOGIC;  --spi clk from master
+      reset_n      : IN     STD_LOGIC;  --active low reset
+      ss_n         : IN     STD_LOGIC;  --active low slave select
+      mosi         : IN     STD_LOGIC;  --master out, slave in
+      rx_req       : IN     STD_LOGIC;  --'1' while busy = '0' moves data to the rx_data output
+      st_load_en   : IN     STD_LOGIC;  --asynchronous load enable
+      st_load_trdy : IN     STD_LOGIC;  --asynchronous trdy load input
+      st_load_rrdy : IN     STD_LOGIC;  --asynchronous rrdy load input
+      st_load_roe  : IN     STD_LOGIC;  --asynchronous roe load input
+      tx_load_en   : IN     STD_LOGIC;  --asynchronous transmit buffer load enable
+      tx_load_data : IN     STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --asynchronous tx data to load
+      trdy         : BUFFER STD_LOGIC := '0';  --transmit ready bit
+      rrdy         : BUFFER STD_LOGIC := '0';  --receive ready bit
+      roe          : BUFFER STD_LOGIC := '0';  --receive overrun error bit
+      rx_data      : OUT    STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
+      busy         : OUT    STD_LOGIC := '0';  --busy signal to logic ('1' during transaction)
+      miso         : OUT    STD_LOGIC := 'Z'); --master in, slave out
   END COMPONENT;
 
 BEGIN
