@@ -62,6 +62,26 @@ END top_level;
 
 ARCHITECTURE str OF top_level IS
   SIGNAL rst_p : STD_LOGIC;
+
+  SIGNAL frame_buffer_0_address  : STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL frame_buffer_0_data     : STD_LOGIC_VECTOR(47 DOWNTO 0);
+
+  --SIGNAL write_address  : STD_LOGIC_VECTOR(8 DOWNTO 0);
+  --SIGNAL write_data     : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  --SIGNAL write_enable   : STD_LOGIC;
+
+  COMPONENT frame_buffer_block_ram
+    PORT (
+      clka : IN STD_LOGIC;
+      wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+      addra : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+      dina : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      clkb : IN STD_LOGIC;
+      addrb : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
+      doutb : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+    );
+  END COMPONENT;
+
 BEGIN
 
 -- NOTE: If you are not using the avr_interface component, then you should uncomment the
@@ -72,6 +92,7 @@ BEGIN
   avr_rx <= 'Z';            -- keep AVR output lines high-Z
   spi_channel <= "ZZZZ";        -- keep AVR output lines high-Z
 
+  -- Some debugging
   leds(7 DOWNTO 4) <= (OTHERS => '1');
   leds(3 DOWNTO 1) <= (OTHERS => '0');
   rst_p <= not rst_n;
@@ -89,7 +110,24 @@ BEGIN
       rgb2        => bottom_rgb,
       row_addr    => line_select,
       lat         => latch,
-      oe_n        => output_enable_n
+      oe_n        => output_enable_n,
+
+      -- Connection with frame buffer
+      memory_address  => frame_buffer_0_address,
+      memory_data     => frame_buffer_0_data
       );
 
+  -- Frame buffer BLOCK RAM 
+  FRAME_BUFFER_0 : frame_buffer_block_ram
+    PORT MAP (
+      -- Write
+      clka    => clk,
+      wea     => (OTHERS => '1'),
+      addra   => (OTHERS => '0'),
+      dina    => (OTHERS => '1'),
+      -- Read
+      clkb    => clk,
+      addrb   => frame_buffer_0_address,
+      doutb   => frame_buffer_0_data
+    );
 END str;

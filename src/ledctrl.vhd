@@ -66,23 +66,12 @@ ENTITY ledctrl IS
     lat      : OUT STD_LOGIC;
     oe_n     : OUT STD_LOGIC;
     -- Connection with frame buffer
-    buffer_address  : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
-    buffer_data     : IN  STD_LOGIC_VECTOR(23 DOWNTO 0)
+    memory_address  : OUT STD_LOGIC_VECTOR(8 DOWNTO 0);
+    memory_data     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0)
     );
 END ledctrl;
 
 ARCHITECTURE bhv OF ledctrl IS
-
-  -- Define types for storing frames
-  SUBTYPE color IS UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
-  TYPE frame_buffer IS ARRAY(
-    INTEGER RANGE 0 TO PANEL_WIDTH-1,
-    INTEGER RANGE 0 TO PANEL_WIDTH-1) OF color;
-
-  -- Three colors so three buffers
-  SIGNAL red_frame : frame_buffer;
-  SIGNAL green_frame : frame_buffer;
-  SIGNAL blue_frame : frame_buffer;
 
   -- Internal signals
   SIGNAL clk_en : STD_LOGIC;
@@ -119,9 +108,10 @@ BEGIN
   -- Breakout internal signals to the output port
   row_addr <= s_row_addr;
 
-  -- col_count is one extra bit long in order to compare against the expected
-  -- width.  So discard that upper bit for ram addr
-  --addr <= s_row_addr & STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0));
+  -- Frame buffer memory contains packed pixels (RGB upper and RGB lower)
+  -- for a total of 48 bits
+  -- Addressing is line_select & col_count
+  memory_address <= s_row_addr & STD_LOGIC_VECTOR(col_count);
 
   ----------------------------------------------------------------------------------------------------------------------
   -- State register
@@ -138,21 +128,8 @@ BEGIN
       oe_n       <= '1';                -- active low, so do not enable LED Matrix output
       lat        <= '0';
       clk_out    <= '0';
-      red_frame   <= (OTHERS => (OTHERS => to_unsigned(0, PIXEL_DEPTH)));
-      green_frame <= (OTHERS => (OTHERS => to_unsigned(0, PIXEL_DEPTH)));
-      blue_frame  <= (OTHERS => (OTHERS => to_unsigned(0, PIXEL_DEPTH)));
     ELSIF(rising_edge(clk_in)) THEN
       IF (clk_en = '1') THEN
-        -- Add some demo colors
-        red_frame(0,0) <= to_unsigned(50, PIXEL_DEPTH);
-        red_frame(15,0) <= to_unsigned(50, PIXEL_DEPTH);
-        red_frame(0,15) <= to_unsigned(50, PIXEL_DEPTH);
-        red_frame(0,15) <= to_unsigned(50, PIXEL_DEPTH);
-
-        green_frame(16,0) <= to_unsigned(50, PIXEL_DEPTH);
-        green_frame(31,0) <= to_unsigned(50, PIXEL_DEPTH);
-        green_frame(16,15) <= to_unsigned(50, PIXEL_DEPTH);
-        green_frame(16,15) <= to_unsigned(50, PIXEL_DEPTH);
 
         -- Run all f/f clocks at the slower clk_en rate
         state      <= next_state;
@@ -178,44 +155,32 @@ BEGIN
   END PROCESS;
 
   -- Next-state logic
-  PROCESS(state, col_count, bpp_count, s_row_addr, red_frame, blue_frame, green_frame) IS
+  PROCESS(state, col_count, bpp_count, s_row_addr, memory_data) IS
+
     -- Internal breakouts
-    VARIABLE extended_upper_row, extended_lower_row : INTEGER RANGE 0 TO 2*PANEL_HALF_HEIGHT-1;
+    VARIABLE upper, lower              : UNSIGNED(DATA_WIDTH/2-1 DOWNTO 0);
     VARIABLE upper_r, upper_g, upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE lower_r, lower_g, lower_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE r1, g1, b1, r2, g2, b2    : STD_LOGIC;
+
   BEGIN
 
-    -- Pixel data is given as 2 combined words, with the upper half containing
-    -- the upper pixel and the lower half containing the lower pixel. Inside
-    -- each half the pixel data is encoded in RGB order with multiple repeated
-    -- bits for each subpixel depending on the chosen color depth. For example,
-    -- a PIXEL_DEPTH of 3 results in a 18-bit word arranged RRRGGGBBBrrrgggbbb.
-    -- The following assignments break up this encoding into the human-readable
-    -- signals used above, or reconstruct it into LED data signals.
-    upper   := UNSIGNED(data(DATA_WIDTH-1 DOWNTO DATA_WIDTH/2));
-    lower   := UNSIGNED(data(DATA_WIDTH/2-1 DOWNTO 0));
+    -- Pixel data is combination of upper and lower RGB pixels
+    -- Each color is represented by 8 bits
+    -- So 3 colors per pixel, 8 bits per color and 2 pixels (1 for each half)
+    -- makes for a total of 48 bits
+    -- | upper R | upper G | upper B | lower R | lower G | lower B |
+    -- | 47 .................................................... 0 |
+
+    upper   := UNSIGNED(memory_data(DATA_WIDTH-1 DOWNTO DATA_WIDTH/2));
+    lower   := UNSIGNED(memory_data(DATA_WIDTH/2-1 DOWNTO 0));
+
     upper_r := upper(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
     upper_g := upper(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
     upper_b := upper(PIXEL_DEPTH-1 DOWNTO 0);
     lower_r := lower(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH);
     lower_g := lower(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH);
     lower_b := lower(PIXEL_DEPTH-1 DOWNTO 0);
-
-
-
-
-  
-
-    extended_upper_row := to_integer(unsigned(s_row_addr));
-    extended_lower_row := to_integer(unsigned('1' & s_row_addr));
-
-    upper_r := red_frame(extended_upper_row,to_integer(unsigned(col_count)));
-    upper_g := green_frame(extended_upper_row,to_integer(unsigned(col_count)));
-    upper_b := blue_frame(extended_upper_row,to_integer(unsigned(col_count)));
-    lower_r := red_frame(extended_lower_row,to_integer(unsigned(col_count)));
-    lower_g := green_frame(extended_lower_row,to_integer(unsigned(col_count)));
-    lower_b := blue_frame(extended_lower_row,to_integer(unsigned(col_count)));
 
     r1 := '0'; g1 := '0'; b1 := '0';    -- Defaults
     r2 := '0'; g2 := '0'; b2 := '0';    -- Defaults

@@ -23,12 +23,19 @@
 -- IN THE SOFTWARE.
 
 library ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
 package rgbmatrix is
     
     -- User configurable constants
     constant PIXEL_DEPTH  : integer := 8; -- number of bits per pixel
     constant CLOCK_DIVIDER : integer := 3;
+
+    -- Frame Buffer
+    constant DATA_WIDTH   : positive := PIXEL_DEPTH*6;
+                                         -- one place for each color (3), times
+                                         -- the number of simultaneous lines (2)
     
     -- Special constants (change these at your own risk, stuff might break!)
     constant PANEL_WIDTH                : integer := 32;    -- width of the panel in pixels
