@@ -56,7 +56,13 @@ ENTITY top_level IS
     spi_channel : out std_logic_vector(3 downto 0);  -- analog read channel (input to AVR service task)
     avr_tx    : in  std_logic;    -- serial data transmited from AVR/USB (FPGA recieve)
     avr_rx    : out std_logic;    -- serial data for AVR/USB to receive (FPGA transmit)
-    avr_rx_busy : in  std_logic   -- AVR/USB buffer full (don't send data when true)
+    avr_rx_busy : in  std_logic;   -- AVR/USB buffer full (don't send data when true)
+    
+    -- SPI slave interface
+    spi_slave_mosi   : in  std_logic;
+    spi_slave_miso   : out  std_logic;
+    spi_slave_n_ss   : in  std_logic;
+    spi_slave_sck     : in  std_logic
     );
 END top_level;
 
@@ -82,25 +88,21 @@ ARCHITECTURE str OF top_level IS
     );
   END COMPONENT;
 
-  COMPONENT spi_slave
+  -- Our simple SPI slave
+  COMPONENT simple_spi_slave IS
     PORT(
-      sclk         : IN     STD_LOGIC;  --spi clk from master
-      reset_n      : IN     STD_LOGIC;  --active low reset
-      ss_n         : IN     STD_LOGIC;  --active low slave select
-      mosi         : IN     STD_LOGIC;  --master out, slave in
-      rx_req       : IN     STD_LOGIC;  --'1' while busy = '0' moves data to the rx_data output
-      st_load_en   : IN     STD_LOGIC;  --asynchronous load enable
-      st_load_trdy : IN     STD_LOGIC;  --asynchronous trdy load input
-      st_load_rrdy : IN     STD_LOGIC;  --asynchronous rrdy load input
-      st_load_roe  : IN     STD_LOGIC;  --asynchronous roe load input
-      tx_load_en   : IN     STD_LOGIC;  --asynchronous transmit buffer load enable
-      tx_load_data : IN     STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --asynchronous tx data to load
-      trdy         : BUFFER STD_LOGIC := '0';  --transmit ready bit
-      rrdy         : BUFFER STD_LOGIC := '0';  --receive ready bit
-      roe          : BUFFER STD_LOGIC := '0';  --receive overrun error bit
-      rx_data      : OUT    STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
-      busy         : OUT    STD_LOGIC := '0';  --busy signal to logic ('1' during transaction)
-      miso         : OUT    STD_LOGIC := 'Z'); --master in, slave out
+    fpga_clock   : IN     STD_LOGIC;  -- clock of FPGA
+    sclk         : IN     STD_LOGIC;  --spi clk from master
+    reset_n      : IN     STD_LOGIC;  --active low reset
+    ss_n         : IN     STD_LOGIC;  --active low slave select
+    mosi         : IN     STD_LOGIC;  --master out, slave in
+    --miso         : OUT    STD_LOGIC := 'Z'); --master in, slave out
+    
+    -- Status bits
+    r_rdy        : OUT    STD_LOGIC;  -- receive ready bit
+    -- Data paths
+    rx_data      : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0)  --receive register output to logic
+    );
   END COMPONENT;
 
 BEGIN
@@ -114,8 +116,8 @@ BEGIN
   spi_channel <= "ZZZZ";        -- keep AVR output lines high-Z
 
   -- Some debugging
-  leds(7 DOWNTO 4) <= (OTHERS => '1');
-  leds(3 DOWNTO 1) <= (OTHERS => '0');
+  --leds(7 DOWNTO 1) <= (OTHERS => '0');
+  --leds(3 DOWNTO 1) <= (OTHERS => '0');
   rst_p <= not rst_n;
 
   -- LED panel controller
@@ -123,7 +125,7 @@ BEGIN
     PORT MAP (
       rst         => rst_p,
       clk_in      => clk,
-      frame       => leds(0),
+      frame       => open,
 
       -- Connection to LED panel
       clk_out     => board_clock,
@@ -151,4 +153,16 @@ BEGIN
       addrb   => frame_buffer_0_address,
       doutb   => frame_buffer_0_data
     );
+
+  spi_slave_interface : simple_spi_slave
+    PORT MAP(
+      fpga_clock => clk,
+      sclk => spi_slave_sck,
+      reset_n => rst_n,
+      ss_n => spi_slave_n_ss,
+      mosi => spi_slave_mosi,
+      r_rdy => open,
+      rx_data => leds
+  );
+
 END str;

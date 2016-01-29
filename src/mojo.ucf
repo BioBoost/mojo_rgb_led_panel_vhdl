@@ -48,3 +48,14 @@ NET "avr_tx" LOC = P55 | IOSTANDARD = LVTTL;
 NET "avr_rx" LOC = P59 | IOSTANDARD = LVTTL;
 NET "avr_rx_busy" LOC = P39 | IOSTANDARD = LVTTL;
 
+# master out, slave in
+NET "spi_slave_mosi" LOC = P80 | IOSTANDARD = LVTTL;
+
+# master in, slave out
+# NET "spi_slave_miso" LOC = P79 | IOSTANDARD = LVTTL;
+
+# active low slave select
+NET "spi_slave_n_ss" LOC = P78 | IOSTANDARD = LVTTL;
+
+# spi clk from master
+NET "spi_slave_sck" LOC = P75 | IOSTANDARD = LVTTL;
