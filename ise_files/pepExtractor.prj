@@ -1,2 +1,3 @@
-work	"../src/command_receiver.vhd"
-work	"../src/simple_spi_slave.vhdl"
+work	"../src/clk_div_dyn.vhd"
+work	"../src/config.vhd"
+work	"../src/ledctrl.vhd"

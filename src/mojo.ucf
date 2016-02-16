@@ -16,13 +16,13 @@ NET "line_select<1>" LOC = P141 | IOSTANDARD = LVTTL;
 NET "line_select<2>" LOC = P140 | IOSTANDARD = LVTTL;
 NET "line_select<3>" LOC = P139 | IOSTANDARD = LVTTL;
 
-NET "top_rgb<0>" LOC = P102 | IOSTANDARD = LVTTL;
+NET "top_rgb<2>" LOC = P102 | IOSTANDARD = LVTTL;
 NET "top_rgb<1>" LOC = P101 | IOSTANDARD = LVTTL;
-NET "top_rgb<2>" LOC = P100 | IOSTANDARD = LVTTL;
+NET "top_rgb<0>" LOC = P100 | IOSTANDARD = LVTTL;
 
-NET "bottom_rgb<0>" LOC = P99 | IOSTANDARD = LVTTL;
+NET "bottom_rgb<2>" LOC = P99 | IOSTANDARD = LVTTL;
 NET "bottom_rgb<1>" LOC = P98 | IOSTANDARD = LVTTL;
-NET "bottom_rgb<2>" LOC = P97 | IOSTANDARD = LVTTL;
+NET "bottom_rgb<0>" LOC = P97 | IOSTANDARD = LVTTL;
 
 NET "cclk" LOC = P70 | IOSTANDARD = LVTTL;
 
