@@ -33,9 +33,8 @@ package rgbmatrix is
     constant CLOCK_DIVIDER : integer := 3;
 
     -- Frame Buffer
-    constant DATA_WIDTH   : positive := PIXEL_DEPTH*6;
-                                         -- one place for each color (3), times
-                                         -- the number of simultaneous lines (2)
+    constant DATA_WIDTH   : positive := 3*PIXEL_DEPTH;
+                                         -- one place for each color (3)
     
     -- Special constants (change these at your own risk, stuff might break!)
     constant PANEL_WIDTH                : integer := 32;    -- width of the panel in pixels

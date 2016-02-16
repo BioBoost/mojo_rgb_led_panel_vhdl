@@ -1,0 +1,2 @@
+work	"../src/command_receiver.vhd"
+work	"../src/simple_spi_slave.vhdl"

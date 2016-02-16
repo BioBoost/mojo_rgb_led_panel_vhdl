@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_command_receiver_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="tb_command_receiver" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="18" />
+   <wvobject fp_name="/tb_command_receiver/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/reset_n" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/buffer_selection" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">buffer_selection</obj_property>
+      <obj_property name="ObjectShortName">buffer_selection</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/r_command" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_command[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_command[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/r_panel_id" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_panel_id[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_panel_id[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/r_line_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_line_address[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_line_address[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/panel_id" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">panel_id[7:0]</obj_property>
+      <obj_property name="ObjectShortName">panel_id[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/line_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">line_address[4:0]</obj_property>
+      <obj_property name="ObjectShortName">line_address[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/column_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">column_address[4:0]</obj_property>
+      <obj_property name="ObjectShortName">column_address[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/w_red" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_red[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_red[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/w_green" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_green[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_green[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/w_blue" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_blue[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_blue[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffa500</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/write_enable" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">write_enable</obj_property>
+      <obj_property name="ObjectShortName">write_enable</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/byte" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">byte[7:0]</obj_property>
+      <obj_property name="ObjectShortName">byte[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/current_state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">current_state</obj_property>
+      <obj_property name="ObjectShortName">current_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/spi_rx_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">spi_rx_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">spi_rx_data[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00ffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/spi_slave_interface/rrdy" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rrdy</obj_property>
+      <obj_property name="ObjectShortName">rrdy</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00ffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_command_receiver/uut/pixel_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">pixel_counter[4:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_counter[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+</wave_config>

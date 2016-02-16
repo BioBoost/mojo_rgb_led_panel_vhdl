@@ -21,10 +21,6 @@
 --     Added an asynchronous active low reset
 --
 --------------------------------------------------------------------------------
--- Source:
--- https://eewiki.net/pages/viewpage.action?pageId=7569477#SerialPeripheralInterface(SPI)Slave(VHDL)-CodeDownload
---------------------------------------------------------------------------------
-
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
@@ -32,8 +28,8 @@ USE ieee.std_logic_arith.all;
 
 ENTITY spi_slave IS
   GENERIC(
-    cpol    : STD_LOGIC := '0';  --spi clock polarity mode
-    cpha    : STD_LOGIC := '0';  --spi clock phase mode
+    cpol    : STD_LOGIC := '1';  --spi clock polarity mode
+    cpha    : STD_LOGIC := '1';  --spi clock phase mode
     d_width : INTEGER := 8);     --data width in bits
   PORT(
     sclk         : IN     STD_LOGIC;  --spi clk from master

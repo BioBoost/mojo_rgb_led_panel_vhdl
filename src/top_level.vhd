@@ -37,9 +37,6 @@ ENTITY top_level IS
     -- Outputs to the 8 onboard LEDs
     leds              : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-	 -- Some debugging
-    --frame             : OUT STD_LOGIC;            -- start of frame (for debug)
-
 	 -- RGB LED Panel Connections
     board_clock       : OUT STD_LOGIC;
     top_rgb           : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -48,7 +45,7 @@ ENTITY top_level IS
     latch             : OUT STD_LOGIC;
     output_enable_n   : OUT STD_LOGIC;
 
-
+    -- Connection with AVR
     spi_sck   : in  std_logic;    -- SPI clock to from AVR
     spi_ss    : in  std_logic;    -- SPI slave select from AVR
     spi_mosi  : in  std_logic;    -- SPI serial data master out, slave in (AVR -> FPGA)
@@ -59,51 +56,55 @@ ENTITY top_level IS
     avr_rx_busy : in  std_logic;   -- AVR/USB buffer full (don't send data when true)
     
     -- SPI slave interface
-    spi_slave_mosi   : in  std_logic;
-    spi_slave_miso   : out  std_logic;
-    spi_slave_n_ss   : in  std_logic;
-    spi_slave_sck     : in  std_logic
+    spi_slave_mosi   : IN STD_LOGIC;
+    spi_slave_miso   : OUT STD_LOGIC;
+    spi_slave_n_ss   : IN STD_LOGIC;
+    spi_slave_sck    : IN STD_LOGIC
     );
 END top_level;
 
 ARCHITECTURE str OF top_level IS
   SIGNAL rst_p : STD_LOGIC;
 
-  SIGNAL frame_buffer_0_address  : STD_LOGIC_VECTOR(8 DOWNTO 0);
-  SIGNAL frame_buffer_0_data     : STD_LOGIC_VECTOR(47 DOWNTO 0);
-
-  --SIGNAL write_address  : STD_LOGIC_VECTOR(8 DOWNTO 0);
-  --SIGNAL write_data     : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  --SIGNAL write_enable   : STD_LOGIC;
-
-  COMPONENT frame_buffer_block_ram
-    PORT (
-      clka : IN STD_LOGIC;
-      wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-      addra : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-      dina : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      clkb : IN STD_LOGIC;
-      addrb : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-      doutb : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
-    );
-  END COMPONENT;
-
-  -- Our simple SPI slave
-  COMPONENT simple_spi_slave IS
+  COMPONENT command_receiver IS
     PORT(
-    fpga_clock   : IN     STD_LOGIC;  -- clock of FPGA
-    sclk         : IN     STD_LOGIC;  --spi clk from master
-    reset_n      : IN     STD_LOGIC;  --active low reset
-    ss_n         : IN     STD_LOGIC;  --active low slave select
-    mosi         : IN     STD_LOGIC;  --master out, slave in
-    --miso         : OUT    STD_LOGIC := 'Z'); --master in, slave out
-    
-    -- Status bits
-    r_rdy        : OUT    STD_LOGIC;  -- receive ready bit
-    -- Data paths
-    rx_data      : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0)  --receive register output to logic
+      -- FPGA signal
+      clk          : IN     STD_LOGIC;          --clock of FPGA
+      reset_n      : IN     STD_LOGIC;          --active low reset
+
+      -- SPI signals
+      spi_slave_sck   : IN     STD_LOGIC;       --spi clk from master
+      spi_slave_n_ss  : IN     STD_LOGIC;       --active low slave select
+      spi_slave_mosi  : IN     STD_LOGIC;       --master out, slave in
+      spi_slave_miso  : OUT    STD_LOGIC := 'Z'; --master in, slave out
+
+      -- For debugging
+      state : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+      -- Panel selection
+      panel_id : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+      -- Buffer control
+      buffer_selection : OUT STD_LOGIC;   -- Toggle to switch to other buffer (0 selects buffer 0 for writing)
+
+      -- Buffer writing
+      line_address : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);         -- 0 to 31
+      column_address : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);       -- 0 to 31
+      w_red : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+      w_green : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+      w_blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+      write_enable : OUT STD_LOGIC       -- '1' to allow writing to memory
     );
   END COMPONENT;
+
+  SIGNAL panel_id : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL buffer_selection : STD_LOGIC;
+  SIGNAL line_address : STD_LOGIC_VECTOR(4 DOWNTO 0);         -- 0 to 31
+  SIGNAL column_address : STD_LOGIC_VECTOR(4 DOWNTO 0);       -- 0 to 31
+  SIGNAL w_red : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL w_green : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL w_blue : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL write_enable : STD_LOGIC;
 
 BEGIN
 
@@ -116,8 +117,7 @@ BEGIN
   spi_channel <= "ZZZZ";        -- keep AVR output lines high-Z
 
   -- Some debugging
-  --leds(7 DOWNTO 1) <= (OTHERS => '0');
-  --leds(3 DOWNTO 1) <= (OTHERS => '0');
+  --leds(7 DOWNTO 0) <= (OTHERS => '0');
   rst_p <= not rst_n;
 
   -- LED panel controller
@@ -125,7 +125,6 @@ BEGIN
     PORT MAP (
       rst         => rst_p,
       clk_in      => clk,
-      frame       => open,
 
       -- Connection to LED panel
       clk_out     => board_clock,
@@ -135,34 +134,45 @@ BEGIN
       lat         => latch,
       oe_n        => output_enable_n,
 
-      -- Connection with frame buffer
-      memory_address  => frame_buffer_0_address,
-      memory_data     => frame_buffer_0_data
-      );
+      -- Buffer control
+      buffer_selection => buffer_selection,
 
-  -- Frame buffer BLOCK RAM 
-  FRAME_BUFFER_0 : frame_buffer_block_ram
-    PORT MAP (
-      -- Write
-      clka    => clk,
-      wea     => (OTHERS => '1'),
-      addra   => (OTHERS => '0'),
-      dina    => (OTHERS => '1'),
-      -- Read
-      clkb    => clk,
-      addrb   => frame_buffer_0_address,
-      doutb   => frame_buffer_0_data
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
     );
 
-  spi_slave_interface : simple_spi_slave
+  U_command_receiver : ENTITY work.command_receiver
     PORT MAP(
-      fpga_clock => clk,
-      sclk => spi_slave_sck,
-      reset_n => rst_n,
-      ss_n => spi_slave_n_ss,
-      mosi => spi_slave_mosi,
-      r_rdy => open,
-      rx_data => leds
-  );
+      -- FPGA signal
+      clk            => clk,
+      reset_n        => rst_n,
+      -- SPI signals
+      spi_slave_sck  => spi_slave_sck,
+      spi_slave_n_ss => spi_slave_n_ss,
+      spi_slave_mosi => spi_slave_mosi,
+      spi_slave_miso => spi_slave_miso,
+
+      -- For debugging
+      state => leds,
+
+      -- Panel selection
+      panel_id => panel_id,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
 
 END str;
