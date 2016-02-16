@@ -81,7 +81,7 @@ END ledctrl;
 
 ARCHITECTURE bhv OF ledctrl IS
 
-  -- Internal signals
+  ---- Internal signals
   SIGNAL clk_en : STD_LOGIC;
 
   -- Essential state machine signals
@@ -89,14 +89,13 @@ ARCHITECTURE bhv OF ledctrl IS
   SIGNAL state, next_state : STATE_TYPE;
 
   -- State machine signals
-  SIGNAL col_count, next_col_count : UNSIGNED(PANEL_WIDTH_VECTOR_SIZE-1 DOWNTO 0);
+  SIGNAL col_count, next_col_count : UNSIGNED(IMG_WIDTH_LOG2 DOWNTO 0);
   SIGNAL bpp_count, next_bpp_count : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
   SIGNAL s_row_addr, next_row_addr : STD_LOGIC_VECTOR(row_addr'range);
   SIGNAL next_rgb1, next_rgb2      : STD_LOGIC_VECTOR(rgb1'range);
   SIGNAL s_oe_n, s_lat, s_clk_out  : STD_LOGIC;
 
   SIGNAL update_rgb : STD_LOGIC;        -- If '1', then update the RGB outputs
-  SIGNAL frame, next_frame : STD_LOGIC; -- If '1', then clocking in pixels at start of a frame
 
   -- Read and write signal used in combination with switching buffers
   SIGNAL buffer_read_address : STD_LOGIC_VECTOR(8 DOWNTO 0);
@@ -222,7 +221,9 @@ BEGIN
   -- Frame buffer memory contains packed pixels (RGB)
   -- for a total of 24 bits
   -- Addressing is line selection (0 to 15) & (pixel selection)
-  buffer_read_address <= s_row_addr & STD_LOGIC_VECTOR(col_count);
+  -- col_count is one extra bit long in order to compare against the expected
+  -- width.  So discard that upper bit for ram addr
+  buffer_read_address <= s_row_addr & STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0));
 
   -- Write address and data has to be constructed (we hide layout of buffer)
   write_address <= line_address(3 DOWNTO 0) & column_address;
@@ -267,8 +268,7 @@ BEGIN
       state      <= INIT;
       col_count  <= (OTHERS => '0');
       bpp_count  <= (OTHERS => '1');    -- first state transition incrs bpp_count so start at -1 so first bpp_count = 0
-      s_row_addr <= (OTHERS => '1');    -- this inits to 1111 because the row_addr is incr when bpp_count = 255
-      frame      <= '0';
+      s_row_addr <= (OTHERS => '1');    -- this inits to 111 because the row_addr is incr when bpp_count = 255
       rgb1       <= (OTHERS => '0');
       rgb2       <= (OTHERS => '0');
       oe_n       <= '1';                -- active low, so do not enable LED Matrix output
@@ -276,13 +276,11 @@ BEGIN
       clk_out    <= '0';
     ELSIF(rising_edge(clk_in)) THEN
       IF (clk_en = '1') THEN
-
         -- Run all f/f clocks at the slower clk_en rate
         state      <= next_state;
         col_count  <= next_col_count;
         bpp_count  <= next_bpp_count;
         s_row_addr <= next_row_addr;
-        frame      <= next_frame;
 
         IF (update_rgb = '1') THEN
           rgb1 <= next_rgb1;
@@ -302,20 +300,14 @@ BEGIN
 
   -- Next-state logic
   PROCESS(state, col_count, bpp_count, s_row_addr, upper_buffer_read_data, lower_buffer_read_data) IS
-
     -- Internal breakouts
+    VARIABLE upper, lower              : UNSIGNED(DATA_WIDTH/2-1 DOWNTO 0);
     VARIABLE upper_r, upper_g, upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE lower_r, lower_g, lower_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
     VARIABLE r1, g1, b1, r2, g2, b2    : STD_LOGIC;
-
   BEGIN
 
-    -- Pixel data is combination of RGB pixels
-    -- Each color is represented by 8 bits
-    -- So 3 colors per pixel and 8 bits per color
-    -- makes for a total of 24 bits
-    -- | R | G | B |
-    -- | 23 .... 0 |
+    -- Pixel data is packed as [R, G, B]
     upper_r := unsigned(upper_buffer_read_data(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH));
     upper_g := unsigned(upper_buffer_read_data(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH));
     upper_b := unsigned(upper_buffer_read_data(PIXEL_DEPTH-1 DOWNTO 0));
@@ -334,9 +326,8 @@ BEGIN
     -- Default signal assignments
     s_clk_out  <= '0';
     s_lat      <= '0';
-    s_oe_n     <= '1';    -- this signal is "active low"
+    s_oe_n     <= '1';                  -- this signal is "active low"
     update_rgb <= '0';
-    next_frame <= '0';
 
     -- States
     CASE state IS
@@ -360,9 +351,7 @@ BEGIN
 
       WHEN INCR_ROW_ADDR =>
         -- display is disabled during row_addr (select lines) update
-        IF (s_row_addr = "1111") THEN
-          next_frame <= '1';                -- indicate at start of a frame (incrementing row to 0)
-        END IF;
+
         next_row_addr  <= STD_LOGIC_VECTOR(UNSIGNED(s_row_addr) + 1);
         next_state <= READ_PIXEL_DATA;
 
@@ -378,13 +367,12 @@ BEGIN
           IF(lower_b >= bpp_count) THEN b2 := '1'; END IF;
         END IF;
         update_rgb     <= '1';              -- clock out these new RGB values
-
-        IF(col_count = PANEL_WIDTH-1) THEN      -- check if at the rightmost side of the image
-          s_oe_n     <= '1';                -- disable display before latch in new LED anodes
-          next_state <= LATCH;
-        ELSE
+        IF(col_count < IMG_WIDTH) THEN      -- check if at the rightmost side of the image
           s_oe_n     <= '0';                -- enable display while simply updating the shift register
           next_state <= INCR_COL_ADDR;
+        ELSE
+          s_oe_n     <= '1';                -- disable display before latch in new LED anodes
+          next_state <= LATCH;
         END IF;
         
       WHEN INCR_COL_ADDR =>
