@@ -30,7 +30,7 @@ package rgbmatrix is
     
     -- User configurable constants
     constant PIXEL_DEPTH  : integer := 8; -- number of bits per pixel
-    constant CLOCK_DIVIDER : integer := 3;
+    constant CLOCK_DIVIDER : integer := 1;
 
     -- Frame Buffer
     constant DATA_WIDTH   : positive := 3*PIXEL_DEPTH;

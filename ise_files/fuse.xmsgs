@@ -5,5 +5,29 @@
      behavior or data corruption.  It is strongly advised that
      users do not edit the contents of this file. -->
 <messages>
+<msg type="warning" file="HDLCompiler" num="89" delta="unknown" >"/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd" Line 166: &lt;<arg fmt="%s" index="1">half_frame_buffer_block_ram</arg>&gt; remains a black-box since it has no binding entity.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="89" delta="unknown" >"/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd" Line 179: &lt;<arg fmt="%s" index="1">half_frame_buffer_block_ram</arg>&gt; remains a black-box since it has no binding entity.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="89" delta="unknown" >"/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd" Line 192: &lt;<arg fmt="%s" index="1">half_frame_buffer_block_ram</arg>&gt; remains a black-box since it has no binding entity.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="89" delta="unknown" >"/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd" Line 205: &lt;<arg fmt="%s" index="1">half_frame_buffer_block_ram</arg>&gt; remains a black-box since it has no binding entity.
+</msg>
+
+<msg type="warning" file="Simulator" num="648" delta="unknown" >&quot;<arg fmt="%s" index="1">/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd</arg>&quot; Line <arg fmt="%d" index="2">166</arg>. Instance <arg fmt="%s" index="3">half_frame_buffer_block_ram</arg> is unbound
+</msg>
+
+<msg type="warning" file="Simulator" num="648" delta="unknown" >&quot;<arg fmt="%s" index="1">/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd</arg>&quot; Line <arg fmt="%d" index="2">179</arg>. Instance <arg fmt="%s" index="3">half_frame_buffer_block_ram</arg> is unbound
+</msg>
+
+<msg type="warning" file="Simulator" num="648" delta="unknown" >&quot;<arg fmt="%s" index="1">/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd</arg>&quot; Line <arg fmt="%d" index="2">192</arg>. Instance <arg fmt="%s" index="3">half_frame_buffer_block_ram</arg> is unbound
+</msg>
+
+<msg type="warning" file="Simulator" num="648" delta="unknown" >&quot;<arg fmt="%s" index="1">/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/../src/ledctrl.vhd</arg>&quot; Line <arg fmt="%d" index="2">205</arg>. Instance <arg fmt="%s" index="3">half_frame_buffer_block_ram</arg> is unbound
+</msg>
+
 </messages>
 

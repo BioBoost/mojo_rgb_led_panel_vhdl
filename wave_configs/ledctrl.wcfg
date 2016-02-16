@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_ledctrl_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="numeric_std" />
+            <top_module name="rgbmatrix" />
+            <top_module name="std_logic_1164" />
+            <top_module name="tb_ledctrl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="17" />
+   <wvobject fp_name="/tb_ledctrl/rst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/clk_in" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/buffer_selection" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">buffer_selection</obj_property>
+      <obj_property name="ObjectShortName">buffer_selection</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/line_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">line_address[4:0]</obj_property>
+      <obj_property name="ObjectShortName">line_address[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/column_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">column_address[4:0]</obj_property>
+      <obj_property name="ObjectShortName">column_address[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/w_red" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_red[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_red[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/w_green" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_green[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_green[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/w_blue" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_blue[7:0]</obj_property>
+      <obj_property name="ObjectShortName">w_blue[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/write_enable" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">write_enable</obj_property>
+      <obj_property name="ObjectShortName">write_enable</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff00ff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/clk_out" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk_out</obj_property>
+      <obj_property name="ObjectShortName">clk_out</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/rgb1" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rgb1[2:0]</obj_property>
+      <obj_property name="ObjectShortName">rgb1[2:0]</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/rgb2" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rgb2[2:0]</obj_property>
+      <obj_property name="ObjectShortName">rgb2[2:0]</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/row_addr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">row_addr[3:0]</obj_property>
+      <obj_property name="ObjectShortName">row_addr[3:0]</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/lat" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">lat</obj_property>
+      <obj_property name="ObjectShortName">lat</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/oe_n" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">oe_n</obj_property>
+      <obj_property name="ObjectShortName">oe_n</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/uut/state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_ledctrl/uut/col_count" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">col_count[4:0]</obj_property>
+      <obj_property name="ObjectShortName">col_count[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+</wave_config>

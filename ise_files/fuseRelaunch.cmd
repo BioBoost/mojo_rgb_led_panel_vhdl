@@ -1,1 +1,1 @@
--intstyle "ise" -incremental -lib "secureip" -o "/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_command_receiver_isim_beh.exe" -prj "/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_command_receiver_beh.prj" "work.tb_command_receiver" 
+-intstyle "ise" -incremental -lib "secureip" -o "/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_ledctrl_isim_beh.exe" -prj "/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_ledctrl_beh.prj" "tb_ledctrl" 
