@@ -74,7 +74,11 @@ ENTITY ledctrl IS
     w_red : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     w_green : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     w_blue : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-    write_enable : IN STD_LOGIC       -- '1' to allow writing to memory
+    write_enable : IN STD_LOGIC;       -- '1' to allow writing to memory
+
+    -- Display selection
+    enable_display : IN STD_LOGIC := '1';   -- When '0' the displays are turned off
+    boot_mode : IN STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
   );
 
 END ledctrl;
@@ -151,6 +155,29 @@ ARCHITECTURE bhv OF ledctrl IS
     );
   END COMPONENT;
 
+  COMPONENT test_pattern_generator IS
+    PORT(
+      line_address : IN STD_LOGIC_VECTOR(4 DOWNTO 0);         -- 0 to 31
+      column_address : IN STD_LOGIC_VECTOR(4 DOWNTO 0);       -- 0 to 31
+
+      -- Outputs
+      upper_r : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+      upper_g : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+      upper_b : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+      lower_r : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+      lower_g : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+      lower_b : OUT UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0)
+    );
+  END COMPONENT;
+
+  -- Test pattern signals
+  SIGNAL tp_cl_upper_r : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+  SIGNAL tp_cl_upper_g : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+  SIGNAL tp_cl_upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+  SIGNAL tp_cl_lower_r : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+  SIGNAL tp_cl_lower_g : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+  SIGNAL tp_cl_lower_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
+
 BEGIN
 
   ----------------------------------------------------------------------------------------------------------------------
@@ -215,6 +242,18 @@ BEGIN
       clkb  => clk_in,
       addrb => lower_buffer_1_read_address,
       doutb => lower_buffer_1_read_data
+    );
+
+  tp_colored_lines : ENTITY work.test_pattern_generator(colored_lines)
+    PORT MAP(
+      line_address => s_row_addr,
+      column_address => STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0)),
+      upper_r => tp_cl_upper_r,
+      upper_g => tp_cl_upper_g,
+      upper_b => tp_cl_upper_b,
+      lower_r => tp_cl_lower_r,
+      lower_g => tp_cl_lower_g,
+      lower_b => tp_cl_lower_b
     );
 
   ----------------------------------------------------------------------------------------------------------------------
@@ -295,7 +334,7 @@ BEGIN
         -- Use f/fs to eliminate variable delays due to combinatorial logic output.
         -- Also, this allows the RGB data to transition on the falling edge of
         -- clk_out in order to maximum the setup and hold times.
-        oe_n    <= s_oe_n;
+        oe_n    <= s_oe_n AND enable_display;
         lat     <= s_lat;
         clk_out <= s_clk_out;
 
@@ -314,12 +353,21 @@ BEGIN
   BEGIN
 
     -- Pixel data is packed as [R, G, B]
-    upper_r := unsigned(upper_buffer_read_data(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH));
-    upper_g := unsigned(upper_buffer_read_data(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH));
-    upper_b := unsigned(upper_buffer_read_data(PIXEL_DEPTH-1 DOWNTO 0));
-    lower_r := unsigned(lower_buffer_read_data(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH));
-    lower_g := unsigned(lower_buffer_read_data(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH));
-    lower_b := unsigned(lower_buffer_read_data(PIXEL_DEPTH-1 DOWNTO 0));
+    IF (boot_mode = '0') THEN
+      upper_r := unsigned(upper_buffer_read_data(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH));
+      upper_g := unsigned(upper_buffer_read_data(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH));
+      upper_b := unsigned(upper_buffer_read_data(PIXEL_DEPTH-1 DOWNTO 0));
+      lower_r := unsigned(lower_buffer_read_data(3*PIXEL_DEPTH-1 DOWNTO 2*PIXEL_DEPTH));
+      lower_g := unsigned(lower_buffer_read_data(2*PIXEL_DEPTH-1 DOWNTO PIXEL_DEPTH));
+      lower_b := unsigned(lower_buffer_read_data(PIXEL_DEPTH-1 DOWNTO 0));
+    ELSE
+      upper_r := tp_cl_upper_r;
+      upper_g := tp_cl_upper_g;
+      upper_b := tp_cl_upper_b;
+      lower_r := tp_cl_lower_r;
+      lower_g := tp_cl_lower_g;
+      lower_b := tp_cl_lower_b;
+    END IF;
 
     r1 := '0'; g1 := '0'; b1 := '0';    -- Defaults
     r2 := '0'; g2 := '0'; b2 := '0';    -- Defaults

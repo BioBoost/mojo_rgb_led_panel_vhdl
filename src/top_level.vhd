@@ -108,7 +108,7 @@ ARCHITECTURE str OF top_level IS
       panel_id : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
       -- Buffer control
-      buffer_selection : OUT STD_LOGIC;   -- Toggle to switch to other buffer (0 selects buffer 0 for writing)
+      buffer_selection : IN STD_LOGIC;   -- Toggle to switch buffers (keep stable to keep buffers as is)
 
       -- Buffer writing
       line_address : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);         -- 0 to 31
@@ -116,7 +116,11 @@ ARCHITECTURE str OF top_level IS
       w_red : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
       w_green : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
       w_blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      write_enable : OUT STD_LOGIC       -- '1' to allow writing to memory
+      write_enable : OUT STD_LOGIC;       -- '1' to allow writing to memory
+
+      -- Display selection
+      enable_display : IN STD_LOGIC := '1';   -- When '0' the displays are turned off
+      boot_mode : IN STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
     );
   END COMPONENT;
 
