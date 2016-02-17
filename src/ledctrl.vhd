@@ -66,7 +66,7 @@ ENTITY ledctrl IS
     oe_n     : OUT STD_LOGIC;
 
     -- Buffer control
-    buffer_selection : IN STD_LOGIC;   -- Toggle to switch to other buffer (0 selects buffer 0 for writing)
+    buffer_selection : IN STD_LOGIC;   -- Toggle to switch buffers (keep stable to keep buffers as is)
 
     -- Buffer writing
     line_address : IN STD_LOGIC_VECTOR(4 DOWNTO 0);         -- 0 to 31
@@ -96,6 +96,9 @@ ARCHITECTURE bhv OF ledctrl IS
   SIGNAL s_oe_n, s_lat, s_clk_out  : STD_LOGIC;
 
   SIGNAL update_rgb : STD_LOGIC;        -- If '1', then update the RGB outputs
+
+  SIGNAL s_buffer_selection : STD_LOGIC;
+  SIGNAL next_buffer_selection : STD_LOGIC;
 
   -- Read and write signal used in combination with switching buffers
   SIGNAL buffer_read_address : STD_LOGIC_VECTOR(8 DOWNTO 0);
@@ -228,16 +231,16 @@ BEGIN
   -- Write address and data has to be constructed (we hide layout of buffer)
   write_address <= line_address(3 DOWNTO 0) & column_address;
   write_data <= w_red & w_green & w_blue;
-    -- Correct memory for writing is selected based on line_address(4) and buffer_selection
+    -- Correct memory for writing is selected based on line_address(4) and s_buffer_selection
 
   -----------------------------------------------------------------------------------------------------------------
   ------------------------ BUFFER SELECTION -----------------------------------------------------------------------
   -----------------------------------------------------------------------------------------------------------------
-  lower_buffer_0_write_enable(0) <= ((not buffer_selection) AND line_address(4) AND write_enable);
-  upper_buffer_0_write_enable(0) <= ((not buffer_selection) AND (not line_address(4)) AND write_enable);
+  lower_buffer_0_write_enable(0) <= ((not s_buffer_selection) AND line_address(4) AND write_enable);
+  upper_buffer_0_write_enable(0) <= ((not s_buffer_selection) AND (not line_address(4)) AND write_enable);
 
-  lower_buffer_1_write_enable(0) <= ((buffer_selection) AND line_address(4) AND write_enable);
-  upper_buffer_1_write_enable(0) <= ((buffer_selection) AND (not line_address(4)) AND write_enable);
+  lower_buffer_1_write_enable(0) <= ((s_buffer_selection) AND line_address(4) AND write_enable);
+  upper_buffer_1_write_enable(0) <= ((s_buffer_selection) AND (not line_address(4)) AND write_enable);
 
   lower_buffer_0_write_address <= write_address;
   upper_buffer_0_write_address <= write_address;
@@ -256,8 +259,8 @@ BEGIN
   lower_buffer_1_read_address <= buffer_read_address;
   upper_buffer_1_read_address <= buffer_read_address;
 
-  lower_buffer_read_data <= lower_buffer_0_read_data WHEN buffer_selection = '1' ELSE lower_buffer_1_read_data;
-  upper_buffer_read_data <= upper_buffer_0_read_data WHEN buffer_selection = '1' ELSE upper_buffer_1_read_data;
+  lower_buffer_read_data <= lower_buffer_0_read_data WHEN s_buffer_selection = '1' ELSE lower_buffer_1_read_data;
+  upper_buffer_read_data <= upper_buffer_0_read_data WHEN s_buffer_selection = '1' ELSE upper_buffer_1_read_data;
 
 
   ----------------------------------------------------------------------------------------------------------------------
@@ -274,6 +277,7 @@ BEGIN
       oe_n       <= '1';                -- active low, so do not enable LED Matrix output
       lat        <= '0';
       clk_out    <= '0';
+      s_buffer_selection <= '0';
     ELSIF(rising_edge(clk_in)) THEN
       IF (clk_en = '1') THEN
         -- Run all f/f clocks at the slower clk_en rate
@@ -281,6 +285,7 @@ BEGIN
         col_count  <= next_col_count;
         bpp_count  <= next_bpp_count;
         s_row_addr <= next_row_addr;
+        s_buffer_selection <= next_buffer_selection;
 
         IF (update_rgb = '1') THEN
           rgb1 <= next_rgb1;
@@ -299,7 +304,8 @@ BEGIN
   END PROCESS;
 
   -- Next-state logic
-  PROCESS(state, col_count, bpp_count, s_row_addr, upper_buffer_read_data, lower_buffer_read_data) IS
+  PROCESS(state, col_count, bpp_count, s_row_addr, upper_buffer_read_data, lower_buffer_read_data,
+    s_buffer_selection) IS
     -- Internal breakouts
     VARIABLE upper, lower              : UNSIGNED(DATA_WIDTH/2-1 DOWNTO 0);
     VARIABLE upper_r, upper_g, upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
@@ -322,6 +328,7 @@ BEGIN
     next_col_count <= col_count;
     next_bpp_count <= bpp_count;
     next_row_addr  <= s_row_addr;
+    next_buffer_selection <= s_buffer_selection;
 
     -- Default signal assignments
     s_clk_out  <= '0';
@@ -351,6 +358,9 @@ BEGIN
 
       WHEN INCR_ROW_ADDR =>
         -- display is disabled during row_addr (select lines) update
+        IF (s_row_addr = "1111") THEN  -- Full frame displayed
+          next_buffer_selection <= buffer_selection;
+        END IF;
 
         next_row_addr  <= STD_LOGIC_VECTOR(UNSIGNED(s_row_addr) + 1);
         next_state <= READ_PIXEL_DATA;
