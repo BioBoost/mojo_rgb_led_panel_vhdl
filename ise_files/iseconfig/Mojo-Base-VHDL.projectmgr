@@ -8,6 +8,7 @@
       <ClosedNodes>
          <ClosedNodesVersion>2</ClosedNodesVersion>
          <ClosedNode>/mojo_top - RTL |home|bioboost|mojo|rgb_led_panel_vhdl|src|mojo_top.vhd/avr_interface - avr_interface - RTL</ClosedNode>
+         <ClosedNode>/top_level - str |home|bioboost|mojo|rgb_led_panel_vhdl|src|top_level.vhd</ClosedNode>
          <ClosedNode>/top_level - str |home|bioboost|mojo|rgb_led_panel_vhdl|src|top_level.vhd/U_LEDCTRL - ledctrl - bhv</ClosedNode>
          <ClosedNode>/top_level - str |home|bioboost|mojo|rgb_led_panel_vhdl|src|top_level.vhd/U_MEMORY - memory - bhv</ClosedNode>
       </ClosedNodes>
@@ -16,7 +17,7 @@
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
-      <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000002020000000100000001000000640000021c000000020000000000000000000000000200000064ffffffff0000008100000003000000020000021c0000000100000003000000000000000100000003</ViewHeaderState>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000020200000001000000010000006400000103000000020000000000000000000000000200000064ffffffff000000810000000300000002000001030000000100000003000000000000000100000003</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >true</UserChangedColumnWidths>
       <CurrentItem>top_level - str (/home/bioboost/mojo/rgb_led_panel_vhdl/src/top_level.vhd)</CurrentItem>
    </ItemView>
@@ -67,16 +68,16 @@
          <ClosedNode>User Constraints</ClosedNode>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>Implement Design</SelectedItem>
+         <SelectedItem>Generate Programming File</SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000018c000000010000000100000000000000000000000064ffffffff0000008100000000000000010000018c0000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem>Implement Design</CurrentItem>
+      <CurrentItem>Generate Programming File</CurrentItem>
    </ItemView>
    <SourceProcessView>000000ff0000000000000002000000c9000000b701000000040100000002</SourceProcessView>
-   <CurrentView>Behavioral Simulation</CurrentView>
+   <CurrentView>Implementation</CurrentView>
    <ItemView engineview="SynthesisOnly" sourcetype="DESUT_UCF" guiview="Process" >
       <ClosedNodes>
          <ClosedNodesVersion>1</ClosedNodesVersion>
@@ -106,17 +107,18 @@
       <ClosedNodes>
          <ClosedNodesVersion>2</ClosedNodesVersion>
          <ClosedNode>/tb_command_receiver - behavior |home|bioboost|mojo|rgb_led_panel_vhdl|ise_files|tb_command_receiver.vhd</ClosedNode>
+         <ClosedNode>/tb_ledctrl - behavior |home|bioboost|mojo|rgb_led_panel_vhdl|ise_files|tb_ledctrl.vhd</ClosedNode>
          <ClosedNode>/tb_simple_spi_slave - behavior |home|bioboost|mojo|rgb_led_panel_vhdl|ise_files|tb_simple_spi_slave.vhd</ClosedNode>
          <ClosedNode>/top_level - str |home|bioboost|mojo|rgb_led_panel_vhdl|src|top_level.vhd</ClosedNode>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>tb_command_receiver - behavior (/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_command_receiver.vhd)</SelectedItem>
+         <SelectedItem>tb_ledctrl - behavior (/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_ledctrl.vhd)</SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000202000000010000000100000064000001b8000000020000000000000000000000000200000064ffffffff000000810000000300000002000001b80000000100000003000000000000000100000003</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >true</UserChangedColumnWidths>
-      <CurrentItem>tb_command_receiver - behavior (/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_command_receiver.vhd)</CurrentItem>
+      <CurrentItem>tb_ledctrl - behavior (/home/bioboost/mojo/rgb_led_panel_vhdl/ise_files/tb_ledctrl.vhd)</CurrentItem>
    </ItemView>
    <ItemView engineview="BehavioralSim" sourcetype="" guiview="Process" >
       <ClosedNodes>
@@ -138,12 +140,12 @@
          <ClosedNodesVersion>1</ClosedNodesVersion>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem></SelectedItem>
+         <SelectedItem/>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000018c000000010000000100000000000000000000000064ffffffff0000008100000000000000010000018c0000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem></CurrentItem>
+      <CurrentItem/>
    </ItemView>
 </Project>

@@ -37,13 +37,36 @@ ENTITY top_level IS
     -- Outputs to the 8 onboard LEDs
     leds              : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-	 -- RGB LED Panel Connections
-    board_clock       : OUT STD_LOGIC;
-    top_rgb           : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    bottom_rgb        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    line_select       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    latch             : OUT STD_LOGIC;
-    output_enable_n   : OUT STD_LOGIC;
+    -- Shared TOP RGB LED Panel Connections
+    t_board_clock       : OUT STD_LOGIC;
+    t_line_select       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    t_latch             : OUT STD_LOGIC;
+    t_output_enable_n   : OUT STD_LOGIC;
+
+    -- Shared BOTTOM RGB LED Panel Connections
+    b_board_clock       : OUT STD_LOGIC;
+    b_line_select       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    b_latch             : OUT STD_LOGIC;
+    b_output_enable_n   : OUT STD_LOGIC;
+
+    -- RGB LED Panel Connections
+    top_rgb_0         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_0      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    top_rgb_1         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_1      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    top_rgb_2         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_2      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    top_rgb_3         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_3      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    top_rgb_4         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_4      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+    top_rgb_5         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    bottom_rgb_5      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
     -- Connection with AVR
     spi_sck   : in  std_logic;    -- SPI clock to from AVR
@@ -106,6 +129,14 @@ ARCHITECTURE str OF top_level IS
   SIGNAL w_blue : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL write_enable : STD_LOGIC;
 
+
+  SIGNAL write_enable_panel_0 : STD_LOGIC;
+  SIGNAL write_enable_panel_1 : STD_LOGIC;
+  SIGNAL write_enable_panel_2 : STD_LOGIC;
+  SIGNAL write_enable_panel_3 : STD_LOGIC;
+  SIGNAL write_enable_panel_4 : STD_LOGIC;
+  SIGNAL write_enable_panel_5 : STD_LOGIC;
+
 BEGIN
 
 -- NOTE: If you are not using the avr_interface component, then you should uncomment the
@@ -120,19 +151,157 @@ BEGIN
   --leds(7 DOWNTO 0) <= (OTHERS => '0');
   rst_p <= not rst_n;
 
+  -- Panel selection
+  write_enable_panel_0 <= '1' WHEN panel_id = x"00" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_1 <= '1' WHEN panel_id = x"01" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_2 <= '1' WHEN panel_id = x"02" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_3 <= '1' WHEN panel_id = x"03" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_4 <= '1' WHEN panel_id = x"04" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_5 <= '1' WHEN panel_id = x"05" OR panel_id = x"FF" ELSE '0';
+
   -- LED panel controller
-  U_LEDCTRL : ENTITY work.ledctrl
+  U_LEDCTRL_0 : ENTITY work.ledctrl
     PORT MAP (
       rst         => rst_p,
       clk_in      => clk,
 
       -- Connection to LED panel
-      clk_out     => board_clock,
-      rgb1        => top_rgb,
-      rgb2        => bottom_rgb,
-      row_addr    => line_select,
-      lat         => latch,
-      oe_n        => output_enable_n,
+      clk_out     => t_board_clock,
+      rgb1        => top_rgb_0,
+      rgb2        => bottom_rgb_0,
+      row_addr    => t_line_select,
+      lat         => t_latch,
+      oe_n        => t_output_enable_n,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
+
+  -- LED panel controller
+  U_LEDCTRL_1 : ENTITY work.ledctrl
+    PORT MAP (
+      rst         => rst_p,
+      clk_in      => clk,
+
+      -- Connection to LED panel
+      clk_out     => open,
+      rgb1        => top_rgb_1,
+      rgb2        => bottom_rgb_1,
+      row_addr    => open,
+      lat         => open,
+      oe_n        => open,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
+
+  -- LED panel controller
+  U_LEDCTRL_2 : ENTITY work.ledctrl
+    PORT MAP (
+      rst         => rst_p,
+      clk_in      => clk,
+
+      -- Connection to LED panel
+      clk_out     => open,
+      rgb1        => top_rgb_2,
+      rgb2        => bottom_rgb_2,
+      row_addr    => open,
+      lat         => open,
+      oe_n        => open,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
+
+  -- LED panel controller
+  U_LEDCTRL_3 : ENTITY work.ledctrl
+    PORT MAP (
+      rst         => rst_p,
+      clk_in      => clk,
+
+      -- Connection to LED panel
+      clk_out     => b_board_clock,
+      rgb1        => top_rgb_3,
+      rgb2        => bottom_rgb_3,
+      row_addr    => b_line_select,
+      lat         => b_latch,
+      oe_n        => b_output_enable_n,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
+
+  -- LED panel controller
+  U_LEDCTRL_4 : ENTITY work.ledctrl
+    PORT MAP (
+      rst         => rst_p,
+      clk_in      => clk,
+
+      -- Connection to LED panel
+      clk_out     => open,
+      rgb1        => top_rgb_4,
+      rgb2        => bottom_rgb_4,
+      row_addr    => open,
+      lat         => open,
+      oe_n        => open,
+
+      -- Buffer control
+      buffer_selection => buffer_selection,
+
+      -- Buffer writing
+      line_address => line_address,
+      column_address => column_address,
+      w_red => w_red,
+      w_green => w_green,
+      w_blue => w_blue,
+      write_enable => write_enable
+    );
+
+  -- LED panel controller
+  U_LEDCTRL_5 : ENTITY work.ledctrl
+    PORT MAP (
+      rst         => rst_p,
+      clk_in      => clk,
+
+      -- Connection to LED panel
+      clk_out     => open,
+      rgb1        => top_rgb_5,
+      rgb2        => bottom_rgb_5,
+      row_addr    => open,
+      lat         => open,
+      oe_n        => open,
 
       -- Buffer control
       buffer_selection => buffer_selection,
