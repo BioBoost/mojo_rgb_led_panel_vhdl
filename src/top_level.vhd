@@ -120,7 +120,7 @@ ARCHITECTURE str OF top_level IS
 
       -- Display selection
       enable_display : IN STD_LOGIC := '1';   -- When '0' the displays are turned off
-      boot_mode : IN STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
+      boot_mode : OUT STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
     );
   END COMPONENT;
 
@@ -132,6 +132,7 @@ ARCHITECTURE str OF top_level IS
   SIGNAL w_green : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL w_blue : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL write_enable : STD_LOGIC;
+  SIGNAL boot_mode : STD_LOGIC;
 
 
   SIGNAL write_enable_panel_0 : STD_LOGIC;
@@ -186,7 +187,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_0
+      write_enable => write_enable_panel_0,
+      boot_mode => boot_mode
     );
 
   -- LED panel controller
@@ -212,7 +214,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_1
+      write_enable => write_enable_panel_1,
+      boot_mode => boot_mode
     );
 
   -- LED panel controller
@@ -238,7 +241,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_2
+      write_enable => write_enable_panel_2,
+      boot_mode => boot_mode
     );
 
   -- LED panel controller
@@ -264,7 +268,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_3
+      write_enable => write_enable_panel_3,
+      boot_mode => boot_mode
     );
 
   -- LED panel controller
@@ -290,7 +295,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_4
+      write_enable => write_enable_panel_4,
+      boot_mode => boot_mode
     );
 
   -- LED panel controller
@@ -316,7 +322,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable_panel_5
+      write_enable => write_enable_panel_5,
+      boot_mode => boot_mode
     );
 
   U_command_receiver : ENTITY work.command_receiver
@@ -345,7 +352,8 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable,
+      boot_mode => boot_mode
     );
 
 END str;

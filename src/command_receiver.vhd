@@ -29,7 +29,8 @@ ENTITY command_receiver IS
     w_red : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
     w_green : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
     w_blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    write_enable : OUT STD_LOGIC       -- '1' to allow writing to memory
+    write_enable : OUT STD_LOGIC ;       -- '1' to allow writing to memory
+    boot_mode : OUT STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
   );
 END command_receiver;
 
@@ -93,6 +94,9 @@ ARCHITECTURE logic OF command_receiver IS
   SIGNAL r_line_address : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL next_line_address : STD_LOGIC_VECTOR(4 DOWNTO 0);
 
+  SIGNAL s_boot_mode : STD_LOGIC;
+  SIGNAL next_boot_mode : STD_LOGIC;
+
   -- State machine
   TYPE STATE_TYPE IS (INIT,
                       EXPECT_CMD, RECEIVE_CMD,
@@ -117,6 +121,7 @@ BEGIN
   w_red <= s_red_value;
   w_green <= s_green_value;
   w_blue <= s_blue_value;
+  boot_mode <= s_boot_mode;
 
   spi_slave_interface : ENTITY work.simple_spi_slave
     PORT MAP(
@@ -167,6 +172,7 @@ BEGIN
       s_red_value <= (OTHERS => '0');
       s_green_value <= (OTHERS => '0');
       s_blue_value <= (OTHERS => '0');
+      s_boot_mode <= '1';     -- Start in boot-mode
 
     ELSIF (rising_edge(clk)) THEN
       s_buffer_selection <= next_buffer_selection;
@@ -176,6 +182,7 @@ BEGIN
       s_red_value <= next_red_value;
       s_green_value <= next_green_value;
       s_blue_value <= next_blue_value;
+      s_boot_mode <= next_boot_mode;
 
     END IF;
   END PROCESS;
@@ -183,7 +190,7 @@ BEGIN
   -- Combinatorial logic for determining next state
   -- We also determine the output here
   com_ns: PROCESS(current_state, spi_busy, spi_data_ready, spi_rx_data, r_line_address, r_command, r_panel_id,
-    s_red_value, s_green_value, s_blue_value, s_buffer_selection, pixel_counter) IS
+    s_red_value, s_green_value, s_blue_value, s_buffer_selection, pixel_counter, s_boot_mode) IS
   BEGIN
     -- Default assingments
     next_buffer_selection <= s_buffer_selection;
@@ -196,11 +203,13 @@ BEGIN
     next_pixel_counter <= pixel_counter;
     write_enable <= '0';
     spi_request_data <= '0';
+    next_boot_mode <= s_boot_mode;
 
     CASE current_state IS
       WHEN INIT =>
         next_state <= EXPECT_CMD;
         next_buffer_selection <= '0';
+        next_boot_mode <= '1';
 
       WHEN EXPECT_CMD =>
         -- Clear all previous data
@@ -215,6 +224,7 @@ BEGIN
         IF(spi_busy = '0' AND spi_data_ready = '1') THEN  --new message from spi
           spi_request_data <= '1';                        --request message from spi
           next_state <= RECEIVE_CMD;                      --retrieve message from spi
+          next_boot_mode <= '0';                          -- First command received will stop boot mode
         ELSE                                              --no new message from spi
           spi_request_data <= '0';
           next_state <= EXPECT_CMD;                       --wait for new message from spi

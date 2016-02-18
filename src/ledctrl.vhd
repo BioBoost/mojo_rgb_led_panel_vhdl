@@ -244,7 +244,7 @@ BEGIN
       doutb => lower_buffer_1_read_data
     );
 
-  tp_colored_lines : ENTITY work.test_pattern_generator(colored_lines)
+  tp_colored_lines : ENTITY work.test_pattern_generator(points)
     PORT MAP(
       line_address => s_row_addr,
       column_address => STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0)),
@@ -344,7 +344,8 @@ BEGIN
 
   -- Next-state logic
   PROCESS(state, col_count, bpp_count, s_row_addr, upper_buffer_read_data, lower_buffer_read_data,
-    s_buffer_selection) IS
+    s_buffer_selection, tp_cl_upper_r, tp_cl_upper_g, tp_cl_upper_b, tp_cl_lower_r, tp_cl_lower_g, tp_cl_lower_b,
+    boot_mode) IS
     -- Internal breakouts
     VARIABLE upper, lower              : UNSIGNED(DATA_WIDTH/2-1 DOWNTO 0);
     VARIABLE upper_r, upper_g, upper_b : UNSIGNED(PIXEL_DEPTH-1 DOWNTO 0);
