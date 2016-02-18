@@ -79,10 +79,10 @@ ENTITY top_level IS
     avr_rx_busy : in  std_logic;   -- AVR/USB buffer full (don't send data when true)
     
     -- SPI slave interface
-    spi_slave_mosi   : IN STD_LOGIC;
-    spi_slave_miso   : OUT STD_LOGIC;
-    spi_slave_n_ss   : IN STD_LOGIC;
-    spi_slave_sck    : IN STD_LOGIC
+    pi_spi_slave_mosi   : IN STD_LOGIC;
+    pi_spi_slave_miso   : OUT STD_LOGIC;
+    pi_spi_slave_n_ss   : IN STD_LOGIC;
+    pi_spi_slave_sck    : IN STD_LOGIC
     );
 END top_level;
 
@@ -321,10 +321,10 @@ BEGIN
       clk            => clk,
       reset_n        => rst_n,
       -- SPI signals
-      spi_slave_sck  => spi_slave_sck,
-      spi_slave_n_ss => spi_slave_n_ss,
-      spi_slave_mosi => spi_slave_mosi,
-      spi_slave_miso => spi_slave_miso,
+      spi_slave_sck  => pi_spi_slave_sck,
+      spi_slave_n_ss => pi_spi_slave_n_ss,
+      spi_slave_mosi => pi_spi_slave_mosi,
+      spi_slave_miso => pi_spi_slave_miso,
 
       -- For debugging
       state => leds,

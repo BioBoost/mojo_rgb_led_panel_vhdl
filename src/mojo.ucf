@@ -31,22 +31,22 @@ NET "avr_rx" LOC = P59 | IOSTANDARD = LVTTL;
 NET "avr_rx_busy" LOC = P39 | IOSTANDARD = LVTTL;
 
 # master out, slave in
-NET "spi_slave_mosi" LOC = P1 | IOSTANDARD = LVTTL;
+# NET "spi_slave_mosi" LOC = P1 | IOSTANDARD = LVTTL;
 
 # master in, slave out
-NET "spi_slave_miso" LOC = P5 | IOSTANDARD = LVTTL;
+# NET "spi_slave_miso" LOC = P5 | IOSTANDARD = LVTTL;
 
 # active low slave select
-NET "spi_slave_n_ss" LOC = P9 | IOSTANDARD = LVTTL;
+# NET "spi_slave_n_ss" LOC = P9 | IOSTANDARD = LVTTL;
 
 # spi clk from master
-NET "spi_slave_sck" LOC = P7 | IOSTANDARD = LVTTL;
+# NET "spi_slave_sck" LOC = P7 | IOSTANDARD = LVTTL;
 
 # SPI channel to Raspberry PI
-# NET "pi_spi_slave_mosi" LOC = P87 | IOSTANDARD = LVTTL;
-# NET "pi_spi_slave_miso" LOC = P92 | IOSTANDARD = LVTTL;
-# NET "pi_spi_slave_n_ss" LOC = P97 | IOSTANDARD = LVTTL;
-# NET "pi_spi_slave_sck" LOC = P94 | IOSTANDARD = LVTTL;
+NET "pi_spi_slave_mosi" LOC = P87 | IOSTANDARD = LVTTL;
+NET "pi_spi_slave_miso" LOC = P92 | IOSTANDARD = LVTTL;
+NET "pi_spi_slave_n_ss" LOC = P97 | IOSTANDARD = LVTTL;
+NET "pi_spi_slave_sck" LOC = P94 | IOSTANDARD = LVTTL;
 
 
 # Shared RGB LED Panel
