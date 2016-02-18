@@ -152,12 +152,12 @@ BEGIN
   rst_p <= not rst_n;
 
   -- Panel selection
-  write_enable_panel_0 <= '1' WHEN panel_id = x"00" OR panel_id = x"FF" ELSE '0';
-  write_enable_panel_1 <= '1' WHEN panel_id = x"01" OR panel_id = x"FF" ELSE '0';
-  write_enable_panel_2 <= '1' WHEN panel_id = x"02" OR panel_id = x"FF" ELSE '0';
-  write_enable_panel_3 <= '1' WHEN panel_id = x"03" OR panel_id = x"FF" ELSE '0';
-  write_enable_panel_4 <= '1' WHEN panel_id = x"04" OR panel_id = x"FF" ELSE '0';
-  write_enable_panel_5 <= '1' WHEN panel_id = x"05" OR panel_id = x"FF" ELSE '0';
+  write_enable_panel_0 <= '1' WHEN (panel_id = x"00" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
+  write_enable_panel_1 <= '1' WHEN (panel_id = x"01" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
+  write_enable_panel_2 <= '1' WHEN (panel_id = x"02" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
+  write_enable_panel_3 <= '1' WHEN (panel_id = x"03" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
+  write_enable_panel_4 <= '1' WHEN (panel_id = x"04" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
+  write_enable_panel_5 <= '1' WHEN (panel_id = x"05" OR panel_id = x"FF") AND write_enable = '1' ELSE '0';
 
   -- LED panel controller
   U_LEDCTRL_0 : ENTITY work.ledctrl
@@ -182,7 +182,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_0
     );
 
   -- LED panel controller
@@ -208,7 +208,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_1
     );
 
   -- LED panel controller
@@ -234,7 +234,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_2
     );
 
   -- LED panel controller
@@ -260,7 +260,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_3
     );
 
   -- LED panel controller
@@ -286,7 +286,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_4
     );
 
   -- LED panel controller
@@ -312,7 +312,7 @@ BEGIN
       w_red => w_red,
       w_green => w_green,
       w_blue => w_blue,
-      write_enable => write_enable
+      write_enable => write_enable_panel_5
     );
 
   U_command_receiver : ENTITY work.command_receiver
