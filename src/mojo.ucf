@@ -54,19 +54,19 @@ NET "t_board_clock" LOC = P143 | IOSTANDARD = LVTTL;
 NET "t_latch" LOC = P141 | IOSTANDARD = LVTTL;
 NET "t_output_enable_n" LOC = P139 | IOSTANDARD = LVTTL;
 
-NET "t_line_select<0>" LOC = P140 | IOSTANDARD = LVTTL;
-NET "t_line_select<1>" LOC = P138 | IOSTANDARD = LVTTL;
-NET "t_line_select<2>" LOC = P142 | IOSTANDARD = LVTTL;
-NET "t_line_select<3>" LOC = P144 | IOSTANDARD = LVTTL;
+NET "t_line_select<3>" LOC = P140 | IOSTANDARD = LVTTL;
+NET "t_line_select<2>" LOC = P138 | IOSTANDARD = LVTTL;
+NET "t_line_select<1>" LOC = P142 | IOSTANDARD = LVTTL;
+NET "t_line_select<0>" LOC = P144 | IOSTANDARD = LVTTL;
 
 NET "b_board_clock" LOC = P80 | IOSTANDARD = LVTTL;
 NET "b_latch" LOC = P82 | IOSTANDARD = LVTTL;
 NET "b_output_enable_n" LOC = P84 | IOSTANDARD = LVTTL;
 
-NET "b_line_select<0>" LOC = P78 | IOSTANDARD = LVTTL;
-NET "b_line_select<1>" LOC = P74 | IOSTANDARD = LVTTL;
-NET "b_line_select<2>" LOC = P66 | IOSTANDARD = LVTTL;
-NET "b_line_select<3>" LOC = P57 | IOSTANDARD = LVTTL;
+NET "b_line_select<3>" LOC = P78 | IOSTANDARD = LVTTL;
+NET "b_line_select<2>" LOC = P74 | IOSTANDARD = LVTTL;
+NET "b_line_select<1>" LOC = P66 | IOSTANDARD = LVTTL;
+NET "b_line_select<0>" LOC = P57 | IOSTANDARD = LVTTL;
 
 # Panel 0
 
