@@ -70,13 +70,13 @@ NET "b_line_select<3>" LOC = P57 | IOSTANDARD = LVTTL;
 
 # Panel 0
 
-NET "top_rgb_0<2>" LOC = P51 | IOSTANDARD = LVTTL;
-NET "top_rgb_0<1>" LOC = P41 | IOSTANDARD = LVTTL;
-NET "top_rgb_0<0>" LOC = P35 | IOSTANDARD = LVTTL;
+NET "top_rgb_2<2>" LOC = P51 | IOSTANDARD = LVTTL;
+NET "top_rgb_2<1>" LOC = P41 | IOSTANDARD = LVTTL;
+NET "top_rgb_2<0>" LOC = P35 | IOSTANDARD = LVTTL;
 
-NET "bottom_rgb_0<2>" LOC = P33 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_0<1>" LOC = P30 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_0<0>" LOC = P27 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_2<2>" LOC = P33 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_2<1>" LOC = P30 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_2<0>" LOC = P27 | IOSTANDARD = LVTTL;
 
 # Panel 1
 
@@ -90,23 +90,23 @@ NET "bottom_rgb_1<0>" LOC = P10 | IOSTANDARD = LVTTL;
 
 # Panel 2
 
-NET "top_rgb_2<2>" LOC = P50 | IOSTANDARD = LVTTL;
-NET "top_rgb_2<1>" LOC = P40 | IOSTANDARD = LVTTL;
-NET "top_rgb_2<0>" LOC = P34 | IOSTANDARD = LVTTL;
+NET "top_rgb_0<2>" LOC = P50 | IOSTANDARD = LVTTL;
+NET "top_rgb_0<1>" LOC = P40 | IOSTANDARD = LVTTL;
+NET "top_rgb_0<0>" LOC = P34 | IOSTANDARD = LVTTL;
 
-NET "bottom_rgb_2<2>" LOC = P32 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_2<1>" LOC = P29 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_2<0>" LOC = P26 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_0<2>" LOC = P32 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_0<1>" LOC = P29 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_0<0>" LOC = P26 | IOSTANDARD = LVTTL;
 
 # Panel 3
 
-NET "top_rgb_3<2>" LOC = P58 | IOSTANDARD = LVTTL;
-NET "top_rgb_3<1>" LOC = P67 | IOSTANDARD = LVTTL;
-NET "top_rgb_3<0>" LOC = P75 | IOSTANDARD = LVTTL;
+NET "top_rgb_5<2>" LOC = P58 | IOSTANDARD = LVTTL;
+NET "top_rgb_5<1>" LOC = P67 | IOSTANDARD = LVTTL;
+NET "top_rgb_5<0>" LOC = P75 | IOSTANDARD = LVTTL;
 
-NET "bottom_rgb_3<2>" LOC = P79 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_3<1>" LOC = P81 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_3<0>" LOC = P83 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_5<2>" LOC = P79 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_5<1>" LOC = P81 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_5<0>" LOC = P83 | IOSTANDARD = LVTTL;
 
 # Panel 4
 
@@ -120,10 +120,10 @@ NET "bottom_rgb_4<0>" LOC = P100 | IOSTANDARD = LVTTL;
 
 # Panel 5
 
-NET "top_rgb_5<2>" LOC = P102 | IOSTANDARD = LVTTL;
-NET "top_rgb_5<1>" LOC = P105 | IOSTANDARD = LVTTL;
-NET "top_rgb_5<0>" LOC = P112 | IOSTANDARD = LVTTL;
+NET "top_rgb_3<2>" LOC = P102 | IOSTANDARD = LVTTL;
+NET "top_rgb_3<1>" LOC = P105 | IOSTANDARD = LVTTL;
+NET "top_rgb_3<0>" LOC = P112 | IOSTANDARD = LVTTL;
 
-NET "bottom_rgb_5<2>" LOC = P115 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_5<1>" LOC = P117 | IOSTANDARD = LVTTL;
-NET "bottom_rgb_5<0>" LOC = P119 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_3<2>" LOC = P115 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_3<1>" LOC = P117 | IOSTANDARD = LVTTL;
+NET "bottom_rgb_3<0>" LOC = P119 | IOSTANDARD = LVTTL;
