@@ -1,6 +1,0 @@
-site_name: Mojo RGB LED panel Controller
-pages:
-- Home: index.md
-- SPI Commands: spi_commands.md
-- Internals: internals.md
-- About: about.md

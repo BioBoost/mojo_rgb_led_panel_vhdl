@@ -1,10 +1,14 @@
 # Mojo RGB Led Panel Control
 
+The Meme Machine project was created by Sille Van Landschoot and Nico De Witte as part of student project for the VIVES University of Bruges (Belgium).
+
 This repo contains the VHDL project that deploys on the Mojo so it can be driven from SPI using a Raspberry Pi.
 
 ![Prototype of Meme Machine](img/prototype.jpg)
 
-## Panel layout
+## Buffer layout
+
+Internally each panel component contains four buffers of 16 lines of 32 pixels (a pixel being R, G and B) each. These buffers are grouped together as an upper and lower part. Together they contain the information for a full frame.
 
 ```text
 --------------------------------
@@ -21,6 +25,8 @@ This repo contains the VHDL project that deploys on the Mojo so it can be driven
 -                              -
 --------------------------------
 ```
+
+While one frame (group of upper and lower buffer) is used as a display buffer, the other frame can be used for writing using the SPI interface. The buffers groups can be switched using an SPI command.
 
 ## Line and pixel addressing
 
@@ -39,3 +45,33 @@ This repo contains the VHDL project that deploys on the Mojo so it can be driven
 .
 .
 ```
+
+## SPI Commands
+
+### Sending pixel data to the controller
+
+Format:
+
+```
+| command | panel id | line address |  pixel data  |
+|   0x01  |   0-254  |    0 - 31    |  R |  G | B  |
+|  1 byte |  1 byte  |    1 byte    | 32 x 3 bytes |
+```
+
+* By using a panel id of 255, you can write the information to all panels
+* Line addressing starts at the top with 0
+
+### Requesting a buffer switch
+
+After sending data to the controller you need to request a buffer switch to get the image to display.
+This can be achieved by sending a buffer switch command via SPI.
+
+Format:
+
+```text
+| command |
+|   0x08  |
+|  1 byte |
+```
+
+In an extreme case where you were to lower the refresh rate of the panels and set the clockrate of SPI very high you may need to add a delay between a buffer switch request and sending new data. If not it may occur that the new data is written to the current display buffer. This is a side effect of the fact that the buffer switch happens after a full frame is displayed. So there may be a slight delay between the request for a buffer switch and the actual switch.
