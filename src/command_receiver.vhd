@@ -30,7 +30,7 @@ ENTITY command_receiver IS
     w_green : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
     w_blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
     write_enable : OUT STD_LOGIC ;       -- '1' to allow writing to memory
-    boot_mode : OUT STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
+    boot_mode : OUT STD_LOGIC := '0'     -- When in bootmode test patterns are displayed
   );
 END command_receiver;
 
@@ -74,8 +74,8 @@ ARCHITECTURE logic OF command_receiver IS
   SIGNAL r_command : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL next_r_command : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-  SIGNAL r_panel_id : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL next_panel_id : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL i_panel_id : UNSIGNED(7 DOWNTO 0);
+  SIGNAL next_panel_id : UNSIGNED(7 DOWNTO 0);
 
   SIGNAL s_red_value : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL s_green_value : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -91,11 +91,17 @@ ARCHITECTURE logic OF command_receiver IS
   SIGNAL s_buffer_selection : STD_LOGIC;
   SIGNAL next_buffer_selection : STD_LOGIC;
 
-  SIGNAL r_line_address : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL next_line_address : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL i_line_address : UNSIGNED(4 DOWNTO 0);
+  SIGNAL next_line_address : UNSIGNED(4 DOWNTO 0);
 
   SIGNAL s_boot_mode : STD_LOGIC;
   SIGNAL next_boot_mode : STD_LOGIC;
+
+  -- Frame Mode:
+  --    If '1' then we receive frame by frame
+  --    If '0' we receive line by line
+  SIGNAL s_frame_mode : STD_LOGIC;
+  SIGNAL next_frame_mode : STD_LOGIC;
 
   -- State machine
   TYPE STATE_TYPE IS (INIT,
@@ -115,9 +121,9 @@ BEGIN
 
   -- Map internal signals to interface signals
   buffer_selection <= s_buffer_selection;
-  line_address <= r_line_address;
+  line_address <= STD_LOGIC_VECTOR(i_line_address);
   column_address <= STD_LOGIC_VECTOR(pixel_counter);
-  panel_id <= r_panel_id;
+  panel_id <= STD_LOGIC_VECTOR(i_panel_id);
   w_red <= s_red_value;
   w_green <= s_green_value;
   w_blue <= s_blue_value;
@@ -166,19 +172,20 @@ BEGIN
   BEGIN
     IF (reset_n = '0') THEN
       s_buffer_selection <= '0';
-      r_line_address <= (OTHERS => '0');
+      i_line_address <= (OTHERS => '0');
       r_command <= (OTHERS => '0');
-      r_panel_id <= (OTHERS => '0');
+      i_panel_id <= (OTHERS => '0');
       s_red_value <= (OTHERS => '0');
       s_green_value <= (OTHERS => '0');
       s_blue_value <= (OTHERS => '0');
       s_boot_mode <= '1';     -- Start in boot-mode
+      s_frame_mode <= '0';    -- Start in line by line mode
 
     ELSIF (rising_edge(clk)) THEN
       s_buffer_selection <= next_buffer_selection;
-      r_line_address <= next_line_address;
+      i_line_address <= next_line_address;
       r_command <= next_r_command;
-      r_panel_id <= next_panel_id;
+      i_panel_id <= next_panel_id;
       s_red_value <= next_red_value;
       s_green_value <= next_green_value;
       s_blue_value <= next_blue_value;
@@ -189,14 +196,15 @@ BEGIN
 
   -- Combinatorial logic for determining next state
   -- We also determine the output here
-  com_ns: PROCESS(current_state, spi_busy, spi_data_ready, spi_rx_data, r_line_address, r_command, r_panel_id,
-    s_red_value, s_green_value, s_blue_value, s_buffer_selection, pixel_counter, s_boot_mode) IS
+  com_ns: PROCESS(current_state, spi_busy, spi_data_ready, spi_rx_data, i_line_address, r_command, i_panel_id,
+    s_red_value, s_green_value, s_blue_value, s_buffer_selection, pixel_counter, s_boot_mode,
+    s_frame_mode) IS
   BEGIN
     -- Default assingments
     next_buffer_selection <= s_buffer_selection;
-    next_line_address <= r_line_address;
+    next_line_address <= i_line_address;
     next_r_command <= r_command;
-    next_panel_id <= r_panel_id;
+    next_panel_id <= i_panel_id;
     next_red_value <= s_red_value;
     next_green_value <= s_green_value;
     next_blue_value <= s_blue_value;
@@ -204,12 +212,14 @@ BEGIN
     write_enable <= '0';
     spi_request_data <= '0';
     next_boot_mode <= s_boot_mode;
+    next_frame_mode <= s_frame_mode;
 
     CASE current_state IS
       WHEN INIT =>
         next_state <= EXPECT_CMD;
         next_buffer_selection <= '0';
         next_boot_mode <= '1';
+        next_frame_mode <= '0';
 
       WHEN EXPECT_CMD =>
         -- Clear all previous data
@@ -220,6 +230,7 @@ BEGIN
         next_green_value <= (OTHERS => '0');
         next_blue_value <= (OTHERS => '0');
         next_pixel_counter <= (OTHERS => '0');
+        next_frame_mode <= '0';
 
         IF(spi_busy = '0' AND spi_data_ready = '1') THEN  --new message from spi
           spi_request_data <= '1';                        --request message from spi
@@ -233,6 +244,7 @@ BEGIN
       WHEN RECEIVE_CMD =>
         next_r_command <= spi_rx_data;       --retrieve message from spi
         spi_request_data <= '0';        --stop requesting
+        next_frame_mode <= '0';
 
         CASE spi_rx_data IS
           WHEN x"01" =>
@@ -243,6 +255,12 @@ BEGIN
             -- Switch buffers
             next_buffer_selection <= not s_buffer_selection;
             next_state <= EXPECT_CMD;
+
+          -- When this command is received we expect a full frame of data
+          -- that follows (just block of RGB data)
+          WHEN x"10" =>
+             next_frame_mode <= '1';
+             next_state <= EXPECT_R_DATA;
 
           -- Command not supported (yet)
           WHEN OTHERS => next_state <= EXPECT_CMD;
@@ -258,7 +276,7 @@ BEGIN
         END IF;
 
       WHEN RECEIVE_PANEL_ID =>
-        next_panel_id <= spi_rx_data;       --retrieve message from spi
+        next_panel_id <= unsigned(spi_rx_data);       --retrieve message from spi
         spi_request_data <= '0';       --stop requesting
         next_state <= EXPECT_LINE_ADDR;
 
@@ -272,7 +290,7 @@ BEGIN
         END IF;
 
       WHEN RECEIVE_LINE_ADDR =>
-        next_line_address <= spi_rx_data(4 downto 0);       --retrieve message from spi
+        next_line_address <= unsigned(spi_rx_data(4 downto 0));       --retrieve message from spi
         spi_request_data <= '0';           --stop requesting
         next_state <= EXPECT_R_DATA;
         next_pixel_counter <= (OTHERS => '0');
@@ -333,14 +351,34 @@ BEGIN
         -- Give memory time to clock in the data
         write_enable <= '1';
 
-        IF (pixel_counter = 31) THEN
-          next_pixel_counter <= (OTHERS => '0');
-          next_state <= EXPECT_CMD;
+        IF (s_frame_mode = '0') THEN
+          IF (pixel_counter = 31) THEN
+            next_pixel_counter <= (OTHERS => '0');
+            next_state <= EXPECT_CMD;
+          ELSE
+            next_pixel_counter <= pixel_counter + 1;
+            next_state <= EXPECT_R_DATA;
+          END IF;
         ELSE
-          next_pixel_counter <= pixel_counter + 1;
           next_state <= EXPECT_R_DATA;
+          IF (pixel_counter = 31) THEN
+            next_pixel_counter <= (OTHERS => '0');
+            IF (i_panel_id = 5) THEN    -- Hardcoded number of panels !!!!!! Refactor
+              next_panel_id <= (OTHERS => '0');
+              IF (i_line_address = 31) THEN
+                next_line_address <= (OTHERS => '0');
+                next_state <= EXPECT_CMD;
+              ELSE
+                next_line_address <= i_line_address + 1;
+              END IF;
+            ELSE
+              next_panel_id <= i_panel_id + 1;
+            END IF;
+          ELSE
+            next_pixel_counter <= pixel_counter + 1;
+          END IF;
         END IF;
-
+      
       WHEN OTHERS => next_state <= INIT;
 
     END CASE;
