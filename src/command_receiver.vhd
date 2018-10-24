@@ -190,6 +190,7 @@ BEGIN
       s_green_value <= next_green_value;
       s_blue_value <= next_blue_value;
       s_boot_mode <= next_boot_mode;
+      s_frame_mode <= next_frame_mode;
 
     END IF;
   END PROCESS;
@@ -258,7 +259,7 @@ BEGIN
 
           -- When this command is received we expect a full frame of data
           -- that follows (just block of RGB data)
-          WHEN x"10" =>
+          WHEN x"09" =>
              next_frame_mode <= '1';
              next_state <= EXPECT_R_DATA;
 
