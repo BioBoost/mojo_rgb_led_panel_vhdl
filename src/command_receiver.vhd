@@ -252,16 +252,21 @@ BEGIN
             -- RGB DATA
             next_state <= EXPECT_PANEL_ID;
 
+          -- When this command is received we expect a full frame of data
+          -- that follows (just block of RGB data)
+          WHEN x"03" =>
+             next_frame_mode <= '1';
+             next_state <= EXPECT_R_DATA;
+
           WHEN x"08" =>
             -- Switch buffers
             next_buffer_selection <= not s_buffer_selection;
             next_state <= EXPECT_CMD;
 
-          -- When this command is received we expect a full frame of data
-          -- that follows (just block of RGB data)
-          WHEN x"09" =>
-             next_frame_mode <= '1';
-             next_state <= EXPECT_R_DATA;
+          WHEN x"20" =>
+            -- Switch buffers
+            next_buffer_selection <= not s_buffer_selection;
+            next_state <= EXPECT_CMD;
 
           -- Command not supported (yet)
           WHEN OTHERS => next_state <= EXPECT_CMD;
