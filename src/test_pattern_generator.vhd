@@ -18,6 +18,22 @@ ENTITY test_pattern_generator IS
   );
 END test_pattern_generator;
 
+ARCHITECTURE all_black OF test_pattern_generator IS
+
+BEGIN
+
+  upper_r <= to_unsigned(0, PIXEL_DEPTH);
+  lower_r <= to_unsigned(0, PIXEL_DEPTH);
+
+  upper_g <= to_unsigned(0, PIXEL_DEPTH);
+  lower_g <= to_unsigned(0, PIXEL_DEPTH);
+
+  upper_b <= to_unsigned(0, PIXEL_DEPTH);
+  lower_b <= to_unsigned(0, PIXEL_DEPTH);
+
+END all_black;
+
+
 ARCHITECTURE colored_lines OF test_pattern_generator IS
 
 BEGIN
