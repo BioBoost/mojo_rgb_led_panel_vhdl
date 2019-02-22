@@ -65,6 +65,19 @@ ARCHITECTURE logic OF command_receiver IS
     );
   END COMPONENT;
 
+  -- We do gamma correction here instead of in led panel.
+  -- This because otherwise we are wasting a lot of hardware resources
+  -- Also dont think gamma correction is task of a panel
+  COMPONENT GammaCorrection IS
+    PORT (
+      input   : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+      output  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+  END COMPONENT;
+
+  SIGNAL gamma_correction_input : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL gamma_correction_output : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
   SIGNAL spi_request_data : STD_LOGIC;
   SIGNAL spi_busy : STD_LOGIC;
   SIGNAL spi_data_ready : STD_LOGIC;
@@ -128,7 +141,7 @@ BEGIN
   w_green <= s_green_value;
   w_blue <= s_blue_value;
   boot_mode <= s_boot_mode;
-
+  
   spi_slave_interface : ENTITY work.simple_spi_slave
     PORT MAP(
       -- FPGA signal
@@ -150,6 +163,12 @@ BEGIN
       -- Data paths
       rx_data      => spi_rx_data
     );
+
+  gamma_correction : ENTITY work.GammaCorrection
+  PORT MAP (
+    input   => gamma_correction_input,
+    output  => gamma_correction_output
+  );
 
   -- Sequential FSM
   -- Nothing more than setting the next state on rithm of clock
@@ -199,7 +218,7 @@ BEGIN
   -- We also determine the output here
   com_ns: PROCESS(current_state, spi_busy, spi_data_ready, spi_rx_data, i_line_address, r_command, i_panel_id,
     s_red_value, s_green_value, s_blue_value, s_buffer_selection, pixel_counter, s_boot_mode,
-    s_frame_mode) IS
+    s_frame_mode, gamma_correction_output) IS
   BEGIN
     -- Default assingments
     next_buffer_selection <= s_buffer_selection;
@@ -311,7 +330,9 @@ BEGIN
         END IF;
 
       WHEN RECEIVE_R_DATA =>
-        next_red_value <= spi_rx_data;       --retrieve message from spi
+        gamma_correction_input <= spi_rx_data;       --retrieve message from spi
+        next_red_value <= gamma_correction_output;   --gamma correct the value
+
         spi_request_data <= '0';           --stop requesting
         next_state <= EXPECT_G_DATA;
 
@@ -325,7 +346,8 @@ BEGIN
         END IF;
 
       WHEN RECEIVE_G_DATA =>
-        next_green_value <= spi_rx_data;       --retrieve message from spi
+        gamma_correction_input <= spi_rx_data;       --retrieve message from spi
+        next_green_value <= gamma_correction_output;   --gamma correct the value
         spi_request_data <= '0';           --stop requesting
         next_state <= EXPECT_B_DATA;
 
@@ -339,7 +361,8 @@ BEGIN
         END IF;
 
       WHEN RECEIVE_B_DATA =>
-        next_blue_value <= spi_rx_data;       --retrieve message from spi
+        gamma_correction_input <= spi_rx_data;       --retrieve message from spi
+        next_blue_value <= gamma_correction_output;   --gamma correct the value
         spi_request_data <= '0';           --stop requesting
         next_state <= PREPARE_WRITE_RGB_TO_MEMORY;
       
