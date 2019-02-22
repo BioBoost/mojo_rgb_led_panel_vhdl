@@ -367,22 +367,36 @@ BEGIN
           END IF;
         ELSE
           next_state <= EXPECT_R_DATA;
+
+          -- Increment pixel counter
+          next_pixel_counter <= pixel_counter + 1;
+
           IF (pixel_counter = 31) THEN
             next_pixel_counter <= (OTHERS => '0');
-            IF (i_panel_id = 5) THEN    -- Hardcoded number of panels !!!!!! Refactor
+
+            next_panel_id <= i_panel_id + 1;          
+            IF (i_panel_id = 2) THEN
               next_panel_id <= (OTHERS => '0');
+
+              next_line_address <= i_line_address + 1;
               IF (i_line_address = 31) THEN
+                -- switch to bottom
                 next_line_address <= (OTHERS => '0');
-                next_state <= EXPECT_CMD;
-              ELSE
-                next_line_address <= i_line_address + 1;
+                next_panel_id <= to_unsigned(3, next_panel_id'length);
               END IF;
-            ELSE
-              next_panel_id <= i_panel_id + 1;
+            ELSIF (i_panel_id = 5) THEN
+              next_panel_id <= to_unsigned(3, next_panel_id'length);
+
+              next_line_address <= i_line_address + 1;
+              IF (i_line_address = 31) THEN
+                -- done
+                next_line_address <= (OTHERS => '0');
+                next_panel_id <= (OTHERS => '0');
+                next_state <= EXPECT_CMD;   -- Finished the frame
+              END IF;
             END IF;
-          ELSE
-            next_pixel_counter <= pixel_counter + 1;
           END IF;
+
         END IF;
       
       WHEN OTHERS => next_state <= INIT;
