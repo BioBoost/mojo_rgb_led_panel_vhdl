@@ -50,9 +50,13 @@ While one frame (group of upper and lower buffer) is used as a display buffer, t
 
 ### Sending pixel data to the controller
 
+The display currently supports two modes, line mode and frame mode.
+
+#### Line Mode
+
 Format:
 
-```
+```text
 | command | panel id | line address |  pixel data  |
 |   0x01  |   0-254  |    0 - 31    |  R |  G | B  |
 |  1 byte |  1 byte  |    1 byte    | 32 x 3 bytes |
@@ -60,6 +64,18 @@ Format:
 
 * By using a panel id of 255, you can write the information to all panels
 * Line addressing starts at the top with 0
+
+#### Frame Mode
+
+Format:
+
+```text
+| command | pixel data  |
+|   0x03  | R |  G | B  |
+|  1 byte | 6 x 32 x 32 x 3 bytes |
+```
+
+So in other words in frame mode, the full data size is 1 byte for the command and 18432 bytes of rgb data.
 
 ### Requesting a buffer switch
 
