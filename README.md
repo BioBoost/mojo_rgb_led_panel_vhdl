@@ -94,4 +94,6 @@ In an extreme case where you were to lower the refresh rate of the panels and se
 
 ## The Panels
 
-More info on the panels can be found at [https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring](https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring). The ones in our possession are equiped with a **variant B** socket. 
+More info on the panels can be found at [https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring](https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring). The ones in our possession are equiped with a **variant B** socket.
+
+![Socket variant B](./img/led_matrix_socket3.png)
