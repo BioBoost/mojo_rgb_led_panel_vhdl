@@ -123,7 +123,7 @@ BEGIN
     END CASE;
   END PROCESS com_ns;     
 
-  -- Buffer data to it stays stable while receiving the next data byte
+  -- Buffer data so it stays stable while receiving the next data byte
   -- Note that data will not be outputted as long as read request has not been issued
   rx_data <= data_buffer;
 

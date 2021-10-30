@@ -244,7 +244,7 @@ BEGIN
       doutb => lower_buffer_1_read_data
     );
 
-  tp_colored_lines : ENTITY work.test_pattern_generator(all_black)
+  tp_boot_pattern : ENTITY work.test_pattern_generator(all_black)
     PORT MAP(
       line_address => s_row_addr,
       column_address => STD_LOGIC_VECTOR(col_count(col_count'high-1 DOWNTO 0)),

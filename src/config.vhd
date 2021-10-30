@@ -28,27 +28,16 @@ USE ieee.numeric_std.ALL;
 
 package rgbmatrix is
     
-    -- User configurable constants
-    constant PIXEL_DEPTH  : integer := 8; -- number of bits per pixel
-    constant CLOCK_DIVIDER : integer := 1;
-
-    -- Frame Buffer
-    constant DATA_WIDTH   : positive := 3*PIXEL_DEPTH;
-                                         -- one place for each color (3)
-    
     -- Special constants (change these at your own risk, stuff might break!)
+    constant PIXEL_DEPTH                : integer := 8;                   -- number of bits per pixel
+    constant CLOCK_DIVIDER              : integer := 1;
+    constant DATA_WIDTH                 : positive := 3*PIXEL_DEPTH;      -- Frame Buffer | one place for each color (3)
     constant PANEL_WIDTH                : integer := 32;    -- width of the panel in pixels
     constant PANEL_WIDTH_VECTOR_SIZE    : integer := 5;     -- number of bits needed for panel width
+    constant PANEL_HEIGHT               : integer := 32; -- height of the panel in pixels
     constant PANEL_HALF_HEIGHT          : integer := 16;    -- height of half panel in pixels
+    constant ADDR_WIDTH                 : positive := 9;
+    constant IMG_WIDTH                  : positive := PANEL_WIDTH;
+    constant IMG_WIDTH_LOG2             : positive := 5;
 
-    -- User configurable constants
-    constant NUM_PANELS   : integer := 1; -- total number of LED matrix panels
-    
-    -- Special constants (change these at your own risk, stuff might break!)
-    constant PANEL_HEIGHT : integer := 32; -- height of the panel in pixels
-    
-    -- Derived constants
-    constant ADDR_WIDTH     : positive := 9;
-    constant IMG_WIDTH      : positive := PANEL_WIDTH*NUM_PANELS;
-    constant IMG_WIDTH_LOG2 : positive := 5;
 end rgbmatrix;

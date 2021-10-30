@@ -83,7 +83,7 @@ ENTITY top_level IS
     pi_spi_slave_miso   : OUT STD_LOGIC;
     pi_spi_slave_n_ss   : IN STD_LOGIC;
     pi_spi_slave_sck    : IN STD_LOGIC
-    );
+  );
 END top_level;
 
 ARCHITECTURE str OF top_level IS
@@ -119,8 +119,8 @@ ARCHITECTURE str OF top_level IS
       write_enable : OUT STD_LOGIC;       -- '1' to allow writing to memory
 
       -- Display selection
-      enable_display : IN STD_LOGIC := '1';   -- When '0' the displays are turned off
-      boot_mode : OUT STD_LOGIC := '0'         -- When in bootmode test patterns are displayed
+      enable_display : IN STD_LOGIC := '1';     -- When '0' the displays are turned off
+      boot_mode : OUT STD_LOGIC := '0'          -- When in bootmode test patterns are displayed
     );
   END COMPONENT;
 

@@ -278,9 +278,8 @@ BEGIN
              next_state <= EXPECT_R_DATA;
 
           WHEN x"08" =>
-            -- Switch buffers
-            next_buffer_selection <= not s_buffer_selection;
-            next_state <= EXPECT_CMD;
+            -- Reset panel
+            next_state <= INIT;
 
           WHEN x"20" =>
             -- Switch buffers
@@ -415,6 +414,7 @@ BEGIN
                 -- done
                 next_line_address <= (OTHERS => '0');
                 next_panel_id <= (OTHERS => '0');
+                next_buffer_selection <= not s_buffer_selection;    -- Switch buffer
                 next_state <= EXPECT_CMD;   -- Finished the frame
               END IF;
             END IF;

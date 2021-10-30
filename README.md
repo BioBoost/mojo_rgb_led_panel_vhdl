@@ -77,6 +77,20 @@ Format:
 
 So in other words in frame mode, the full data size is 1 byte for the command and 18432 bytes of rgb data.
 
+In frame mode you do not need to request a buffer switch. The buffers will automatically be switched once the frame is written.
+
+### Boot Screen
+
+Format:
+
+```text
+| command |
+|   0x08  |
+|  1 byte |
+```
+
+Switch back to the boot screen which is a black screen by default.
+
 ### Requesting a buffer switch
 
 After sending data to the controller you need to request a buffer switch to get the image to display.
@@ -86,7 +100,7 @@ Format:
 
 ```text
 | command |
-|   0x08  |
+|   0x20  |
 |  1 byte |
 ```
 
