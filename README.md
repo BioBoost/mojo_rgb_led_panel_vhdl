@@ -91,3 +91,9 @@ Format:
 ```
 
 In an extreme case where you were to lower the refresh rate of the panels and set the clockrate of SPI very high you may need to add a delay between a buffer switch request and sending new data. If not it may occur that the new data is written to the current display buffer. This is a side effect of the fact that the buffer switch happens after a full frame is displayed. So there may be a slight delay between the request for a buffer switch and the actual switch.
+
+## The Panels
+
+More info on the panels can be found at [https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring](https://learn.adafruit.com/32x16-32x32-rgb-led-matrix/new-wiring). The ones in our possession are equipped with a **variant B** socket.
+
+![Socket variant B](./img/led_matrix_socket3.png)
